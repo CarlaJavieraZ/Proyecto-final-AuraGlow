@@ -1,4 +1,3 @@
-// src/components/ProductCard.jsx
 import React from "react";
 
 const ProductCard = ({ product }) => {
@@ -8,7 +7,7 @@ const ProductCard = ({ product }) => {
       <div className="card-body">
         <h5 className="card-title">{product.name}</h5>
         <p className="card-text">{product.description}</p>
-        <a href="#" className="btn btn-primary">
+        <a href={product.url} className="btn btn-primary">
           ${product.price}
         </a>
       </div>
