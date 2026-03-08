@@ -1,24 +1,21 @@
-// src/components/Home.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import ProductList from "./products/ProductList";
-import axios from "axios";
+import productsData from "../assets/mockdata/products.json";
+import Carousel from "./ui/Carousel";
+import FeaturedSections from "./layout/FeaturedSections";
 
 const Home = () => {
-  const [products, setProducts] = useState([]);
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      const response = await axios.get("https://api.example.com/products");
-      setProducts(response.data);
-    };
-
-    fetchProducts();
-  }, []); // La dependencia vacía asegura que solo se ejecute una vez
+  const [products] = useState(productsData);
 
   return (
     <div>
-      <h1>Bienvenido a Aura Glow</h1>
-      <ProductList products={products} />
+      <div className="container">
+        <Carousel />
+        <hr className="my-5" />
+        <FeaturedSections />
+        <hr className="my-5" />
+        <ProductList products={products} />
+      </div>
     </div>
   );
 };

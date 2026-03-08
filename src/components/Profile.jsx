@@ -11,7 +11,7 @@ const Profile = () => {
 
   return (
     <div>
-      <h2>Perfil de {user.email}</h2>
+      <h2>Perfil de {user.nombre}</h2>
       <button onClick={logout}>Cerrar sesión</button>
     </div>
   );
