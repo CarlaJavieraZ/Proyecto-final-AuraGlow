@@ -1,32 +1,54 @@
-// src/context/CartContext.jsx
-import React, { createContext, useState, useContext } from "react";
+import { createContext, useContext, useState } from "react";
 
 const CartContext = createContext();
 
-const CartProvider = ({ children }) => {
+export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
 
-  const addToCart = (product) => {
-    setCart((prevCart) => [...prevCart, product]);
+  const addToCart = (aura) => {
+    const existing = cart.find((item) => item.id === aura.id);
+    if (existing) {
+      setCart(
+        cart.map((item) =>
+          item.id === aura.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        )
+      );
+    } else {
+      setCart([...cart, { ...aura, quantity: 1 }]);
+    }
   };
 
-  const removeFromCart = (productId) => {
-    setCart((prevCart) => prevCart.filter((item) => item.id !== productId));
+  const removeFromCart = (id) => {
+    setCart(
+      cart.map((item) => {
+        if (item.id === id) {
+          if (item.quantity > 1) {
+            return { ...item, quantity: item.quantity - 1 };
+          }
+          return null;
+        }
+        return item;
+      }).filter(Boolean)
+    );
   };
+
+
+  const clearCart = () => setCart([]);
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart }}>
+    <CartContext.Provider
+      value={{
+        cart,
+        addToCart,
+        removeFromCart,
+        clearCart
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
 };
 
-const useCart = () => {
-  const context = useContext(CartContext);
-  if (!context) {
-    throw new Error("useCart debe ser usado dentro de un CartProvider");
-  }
-  return context;
-};
-
-export { CartProvider, useCart };
+export const useCart = () => useContext(CartContext);

@@ -7,6 +7,8 @@ import Profile from "../components/Profile";
 import PrivateRoute from "./PrivateRoute"; // Ruta privada
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
+import Cart from "../components/ui/Cart";
+
 
 const AppRouter = () => {
   return (
@@ -24,6 +26,7 @@ const AppRouter = () => {
             </PrivateRoute>
           }
         />
+        <Route path="/cart" element={<Cart />} />
       </Routes>
       <Footer/>
     </Router>
