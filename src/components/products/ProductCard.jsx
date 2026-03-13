@@ -32,7 +32,10 @@ const ProductCard = ({ product }) => {
         </p>
 
         <p className="product-card-price mb-3">
-          ${Number(product.price).toLocaleString("es-CL")}
+          {product.price.toLocaleString("es-CL", {
+            style: "currency",
+            currency: "CLP",
+          })}
         </p>
 
         <div className="d-grid gap-2 mt-auto">
@@ -44,9 +47,11 @@ const ProductCard = ({ product }) => {
           </button>
 
           <button
-            className={`btn ${
-              wished ? "product-wishlist-btn-active" : "product-wishlist-btn"
-            }`}
+            className={
+              wished
+                ? "product-wishlist-btn-active"
+                : "product-wishlist-btn"
+            }
             onClick={handleWishlist}
           >
             {wished ? "♥ Quitar de deseados" : "♡ Agregar a deseados"}
