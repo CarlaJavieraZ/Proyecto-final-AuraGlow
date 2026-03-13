@@ -48,7 +48,7 @@ const Cart = () => {
                     <div className="row g-4">
                         <div className="col-lg-8">
                             {cart.map((item) => (
-                                <div key={item.id} className="cart-item-card mb-3">
+                                <div key={item._id} className="cart-item-card mb-3">
                                     <div className="row align-items-center g-3">
                                         <div className="col-md-3 text-center">
                                             <img
@@ -73,7 +73,7 @@ const Cart = () => {
                                                 <div className="cart-quantity-box">
                                                     <button
                                                         className="cart-qty-btn"
-                                                        onClick={() => removeFromCart(item.id)}
+                                                        onClick={() => removeFromCart(item._id)}
                                                     >
                                                         −
                                                     </button>

@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "../components/Home";
 import Login from "../components/auth/LoginForm";
 import Register from "../components/auth/RegisterForm";
@@ -8,6 +8,7 @@ import PrivateRoute from "./PrivateRoute"; // Ruta privada
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import Cart from "../components/ui/Cart";
+import Wishlist from "../components/ui/Wishlist";
 
 
 const AppRouter = () => {
@@ -27,8 +28,9 @@ const AppRouter = () => {
           }
         />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/wishlist" element={<Wishlist />} />
       </Routes>
-      <Footer/>
+      <Footer />
     </Router>
   );
 };

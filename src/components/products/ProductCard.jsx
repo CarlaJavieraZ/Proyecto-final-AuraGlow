@@ -1,15 +1,57 @@
 import React from "react";
+import { useCart } from "../../context/CartContext";
+import { useWishlist } from "../../context/WishlistContext";
 
 const ProductCard = ({ product }) => {
+  const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+
+  const wished = isInWishlist(product._id);
+
+  const handleWishlist = () => {
+    if (wished) {
+      removeFromWishlist(product._id);
+    } else {
+      addToWishlist(product);
+    }
+  };
+
   return (
-    <div className="card" style={{ width: "18rem" }}>
-      <img src={product.image} className="card-img-top" alt={product.name} />
-      <div className="card-body">
-        <h5 className="card-title">{product.name}</h5>
-        <p className="card-text">{product.description}</p>
-        <a href={product.url} className="btn btn-primary">
-          ${product.price}
-        </a>
+    <div className="card h-100 shadow-sm border-0 product-card mx-auto">
+      <img
+        src={product.image}
+        className="card-img-top product-card-image"
+        alt={product.name}
+      />
+
+      <div className="card-body d-flex flex-column">
+        <h5 className="card-title product-card-title">{product.name}</h5>
+
+        <p className="card-text product-card-description">
+          {product.description}
+        </p>
+
+        <p className="product-card-price mb-3">
+          ${Number(product.price).toLocaleString("es-CL")}
+        </p>
+
+        <div className="d-grid gap-2 mt-auto">
+          <button
+            className="btn product-cart-btn"
+            onClick={() => addToCart(product)}
+          >
+            Agregar al carrito
+          </button>
+
+          <button
+            className={`btn ${
+              wished ? "product-wishlist-btn-active" : "product-wishlist-btn"
+            }`}
+            onClick={handleWishlist}
+          >
+            {wished ? "♥ Quitar de deseados" : "♡ Agregar a deseados"}
+          </button>
+        </div>
       </div>
     </div>
   );
