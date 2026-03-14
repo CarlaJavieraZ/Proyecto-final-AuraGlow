@@ -3,10 +3,10 @@ import CarouselItem from "./CarouselItem";
 
 const slides = [
   {
-    src: "https://placehold.co/600x200@2x.png",
+    src: "/images/banners/pielrostro.jpg",
     alt: "Slide 1",
-    title: "First slide label",
-    description: "Some representative placeholder content",
+    title: "Piel perfecta",
+    description: "Tu rutina perfecta",
   },
   {
     src: "https://placehold.co/600x200@2x.png",
