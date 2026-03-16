@@ -9,17 +9,18 @@ const slides = [
     description: "Tu rutina perfecta",
   },
   {
-    src: "https://placehold.co/600x200@2x.png",
+    src: "/images/banners/cream.jpg",
     alt: "Slide 2",
-    title: "Second slide label",
-    description: "Some representative placeholder content",
+    title: "El producto perfecto para ti",
+    description: "Todo hecho con los mejores ingredientes",
   },
   {
-    src: "https://placehold.co/600x200@2x.png",
+    src: "/images/banners/cremarostro.png",
     alt: "Slide 3",
-    title: "Third slide label",
-    description: "Some representative placeholder content",
+    title: "Piel más hidratada",
+    description: "Para lucir radiante",
   },
+  
 ];
 
 const Carousel = () => {

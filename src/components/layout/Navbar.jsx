@@ -5,6 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
 import { useWishlist } from "../../context/WishlistContext";
 
+
 const Navbar = () => {
   const { user, logout } = useAuth();
   const { cart } = useCart();
@@ -21,12 +22,15 @@ const Navbar = () => {
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4">
-      <Link className="navbar-brand" to="/">
-        Aura Glow
+      <Link className="navbar-brand d-flex align-items-center" to="/">
+        <img
+          src="/images/logonav.png"
+          alt="Aura Glow"
+          className="navbar-logo"
+        />
       </Link>
 
       <div className="navbar-nav ms-auto align-items-center">
-
         {/* Inicio */}
         <Link className="nav-link" to="/">
           Inicio
@@ -58,6 +62,13 @@ const Navbar = () => {
             <Link className="nav-link ms-2" to="/profile">
               Perfil
             </Link>
+
+            {/* Admin solo si corresponde */}
+            {user?.role === "admin" && (
+              <Link className="nav-link ms-2" to="/admin">
+                Admin
+              </Link>
+            )}
 
             {/* Saludo */}
             <span className="navbar-text mx-2 navbar-user-name">

@@ -91,4 +91,7 @@ https://json-generator.com/
   }
 ]
 ```
-#
+## ADMIN ACCESS
+
+correo: admin@auraglow.com
+contraseña: 123456

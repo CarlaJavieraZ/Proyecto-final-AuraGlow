@@ -60,6 +60,7 @@ a {
 .navbar {
   background: linear-gradient(90deg, #f4b6cc 0%, #eaa8c0 100%) !important;
   box-shadow: 0 6px 18px rgba(232, 180, 198, 0.2);
+  padding: 6px 24px;
 }
 
 .navbar-brand {
@@ -96,6 +97,13 @@ a {
   background-color: white;
   color: #d66b92;
   border-color: white;
+}
+
+.navbar-logo {
+  height: 120px;
+  width: auto;
+  margin-top: -40px;
+  margin-bottom: -40px;
 }
 
 /* ====== HOME / PÁGINA PRINCIPAL ====== */
@@ -702,6 +710,99 @@ a {
   background: #fff1f6;
   color: #b64d77;
 }
+
+
+/* ====== ADMIN ====== */
+
+.admin-page {
+  background: linear-gradient(180deg, #fffafa 0%, #fff0f5 100%);
+  min-height: 100vh;
+}
+
+.admin-box {
+  background: #ffffff;
+  border: 1px solid #f8d7e3;
+  border-radius: 24px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(232, 180, 198, 0.18);
+}
+
+.admin-title {
+  color: #d66b92;
+  font-weight: 700;
+}
+
+.admin-subtitle,
+.admin-note {
+  color: #8c6f7b;
+}
+
+.admin-section-title {
+  color: #c85f86;
+  font-weight: 700;
+}
+
+.admin-table thead th {
+  color: #c85f86;
+  background-color: #fff4f8;
+  border-bottom: 1px solid #f3d5df;
+}
+
+.admin-table tbody td {
+  color: #6f5c64;
+  vertical-align: middle;
+}
+
+.admin-product-image {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid #f3d5df;
+  background: #fff;
+  padding: 0.2rem;
+}
+
+.admin-add-btn {
+  background: linear-gradient(135deg, #f3b6ca, #ec9fbd);
+  border: none;
+  color: white;
+  font-weight: 600;
+  border-radius: 14px;
+  padding: 0.7rem 1rem;
+}
+
+.admin-add-btn:hover {
+  background: linear-gradient(135deg, #ec9fbd, #e889ad);
+  color: white;
+}
+
+.admin-edit-btn {
+  background: white;
+  border: 1px solid #efbfd1;
+  color: #c85f86;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.admin-edit-btn:hover {
+  background: #fff1f6;
+  color: #b64d77;
+}
+
+.admin-delete-btn {
+  background: #fde7ef;
+  border: 1px solid #efbfd1;
+  color: #c14976;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.admin-delete-btn:hover {
+  background: #fadbe7;
+  color: #b03d69;
+}
+
 
 /* ====== FOOTER ====== */
 

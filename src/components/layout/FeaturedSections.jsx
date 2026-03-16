@@ -4,7 +4,7 @@ const sections = [
   {
     id: 1,
     title: "Productos Destacados",
-    subtitle: "Must Have",
+    subtitle: "",
     images: [
       "/images/productsmusthave/serum.jpg",
       "/images/productsmusthave/tonic.jpg",
@@ -14,7 +14,7 @@ const sections = [
   {
     id: 2,
     title: "Lo Más Vendido",
-    subtitle: "Best Choices",
+    subtitle: "",
     images: [
       "/images/productsmusthave/tonic.jpg",
       "/images/productsmusthave/cream.jpg",
@@ -24,7 +24,7 @@ const sections = [
   {
     id: 3,
     title: "Nuevos Productos",
-    subtitle: "Event Editor",
+    subtitle: "",
     images: [
       "/images/productsmusthave/cream.jpg",
       "/images/productsmusthave/serum.jpg",

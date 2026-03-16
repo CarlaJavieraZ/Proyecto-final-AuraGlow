@@ -38,5 +38,26 @@
     "name": "Crema AuraGlow",
     "image": "/images/products/cremarostro.png",
     "url": "/"
+  },
+   {
+    "_id": "5",
+    "name": "Jabon Facial",
+    "price": 15990,
+    "description": "Limpiador suave para el rostro",
+    "image": "/images/productsmusthave/tonic.jpg"
+  },
+  {
+    "_id": "6",
+    "name": "Serum para poros",
+    "price": 12990,
+    "description": "Reduce los poros",
+    "image": "/images/productsmusthave/serum.jpg"
+  },
+  {
+    "_id": "7",
+    "name": "Crema facial ",
+    "price": 12990,
+    "description": "Crema de perlas",
+    "image": "/images/productsmusthave/cream.jpg"
   }
 ]
