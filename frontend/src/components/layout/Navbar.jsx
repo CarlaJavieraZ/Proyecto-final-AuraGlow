@@ -5,7 +5,6 @@ import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
 import { useWishlist } from "../../context/WishlistContext";
 
-
 const Navbar = () => {
   const { user, logout } = useAuth();
   const { cart } = useCart();
@@ -21,7 +20,7 @@ const Navbar = () => {
   const totalWishlistItems = wishlist.length;
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4">
+    <nav className="navbar navbar-expand-lg navbar-light navbar-custom px-4">
       <Link className="navbar-brand d-flex align-items-center" to="/">
         <img
           src="/images/logonav.png"
@@ -30,69 +29,115 @@ const Navbar = () => {
         />
       </Link>
 
-      <div className="navbar-nav ms-auto align-items-center">
-        {/* Inicio */}
-        <Link className="nav-link" to="/">
-          Inicio
-        </Link>
+      <button
+        className="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#mainNavbar"
+        aria-controls="mainNavbar"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span className="navbar-toggler-icon"></span>
+      </button>
 
-        {/* Carrito */}
-        <Link to="/cart" className="nav-link position-relative ms-2">
-          <FaShoppingCart size={22} />
-          {totalItems > 0 && (
-            <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-              {totalItems}
-            </span>
-          )}
-        </Link>
+      <div className="collapse navbar-collapse" id="mainNavbar">
+        <div className="navbar-nav ms-auto align-items-lg-center">
+          <Link className="nav-link" to="/">
+            Inicio
+          </Link>
 
-        {/* Wishlist */}
-        <Link to="/wishlist" className="nav-link position-relative ms-2">
-          <FaHeart size={20} />
-          {totalWishlistItems > 0 && (
-            <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-              {totalWishlistItems}
-            </span>
-          )}
-        </Link>
-
-        {user ? (
-          <>
-            {/* Perfil */}
-            <Link className="nav-link ms-2" to="/profile">
-              Perfil
-            </Link>
-
-            {/* Admin solo si corresponde */}
-            {user?.role === "admin" && (
-              <Link className="nav-link ms-2" to="/admin">
-                Admin
-              </Link>
-            )}
-
-            {/* Saludo */}
-            <span className="navbar-text mx-2 navbar-user-name">
-              Hola, {user.nombre}
-            </span>
-
-            {/* Cerrar sesión */}
+          <li className="nav-item dropdown list-unstyled">
             <button
-              className="btn btn-outline-danger btn-sm ms-2"
-              onClick={handleLogout}
+              className="nav-link dropdown-toggle btn btn-link text-decoration-none"
+              id="categoriesDropdown"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              type="button"
             >
-              Cerrar sesión
+              Categorías
             </button>
-          </>
-        ) : (
-          <>
-            <Link className="nav-link ms-2" to="/login">
-              Iniciar Sesión
-            </Link>
-            <Link className="nav-link ms-2" to="/register">
-              Registrarse
-            </Link>
-          </>
-        )}
+            <ul className="dropdown-menu" aria-labelledby="categoriesDropdown">
+              <li>
+                <Link className="dropdown-item" to="/?category=Todas">
+                  ✨ Todas
+                </Link>
+              </li>
+              <li>
+                <Link className="dropdown-item" to="/?category=Jabones">
+                  🧼 Jabones
+                </Link>
+              </li>
+              <li>
+                <Link className="dropdown-item" to="/?category=Tonicos">
+                  💧 Tonicos
+                </Link>
+              </li>
+              <li>
+                <Link className="dropdown-item" to="/?category=Serums">
+                  ✨ Serums
+                </Link>
+              </li>
+              <li>
+                <Link className="dropdown-item" to="/?category=Cremas">
+                  🧴 Cremas
+                </Link>
+              </li>
+            </ul>
+          </li>
+
+          <Link to="/cart" className="nav-link position-relative ms-2">
+            <FaShoppingCart size={22} />
+            {totalItems > 0 && (
+              <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                {totalItems}
+              </span>
+            )}
+          </Link>
+
+          <Link to="/wishlist" className="nav-link position-relative ms-2">
+            <FaHeart size={20} />
+            {totalWishlistItems > 0 && (
+              <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                {totalWishlistItems}
+              </span>
+            )}
+          </Link>
+
+          {user ? (
+            <>
+              <Link className="nav-link ms-2" to="/profile">
+                Perfil
+              </Link>
+
+              {user?.role === "admin" && (
+                <Link className="nav-link ms-2" to="/admin">
+                  Admin
+                </Link>
+              )}
+
+              <span className="navbar-text mx-2 navbar-user-name">
+                Hola, {user.nombre}
+              </span>
+
+              <button
+                className="btn btn-outline-danger btn-sm ms-2"
+                onClick={handleLogout}
+              >
+                Cerrar sesión
+              </button>
+            </>
+          ) : (
+            <>
+              <Link className="nav-link ms-2" to="/login">
+                Iniciar Sesión
+              </Link>
+              <Link className="nav-link ms-2" to="/register">
+                Registrarse
+              </Link>
+            </>
+          )}
+        </div>
       </div>
     </nav>
   );

@@ -11,6 +11,7 @@ import Footer from "../components/layout/Footer";
 import Cart from "../components/ui/Cart";
 import Wishlist from "../components/ui/Wishlist";
 import AdminPanel from "../components/AdminPanel";
+import ProductDetail from "../components/products/ProductDetail";
 
 const AppRouter = () => {
   return (
@@ -41,6 +42,7 @@ const AppRouter = () => {
 
         <Route path="/cart" element={<Cart />} />
         <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/product/:id" element={<ProductDetail />} />
       </Routes>
       <Footer />
     </Router>

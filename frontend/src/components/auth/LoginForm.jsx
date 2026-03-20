@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -24,44 +24,52 @@ const Login = () => {
   };
 
   return (
-    <div className="container mt-5">
-      <div className="row justify-content-center">
-        <div className="col-md-6 col-lg-4">
-          <div className="card p-4 shadow-sm">
-            <h2 className="text-center mb-4">Iniciar sesión</h2>
+    <div className="auth-page">
+      <div className="container py-5">
+        <div className="auth-box">
+          <h2 className="auth-title mb-2 text-center">Iniciar sesión</h2>
+          <p className="auth-subtitle mb-4 text-center">
+            Accede a tu cuenta para continuar comprando en Aura Glow.
+          </p>
 
-            {error && <div className="alert alert-danger p-2">{error}</div>}
+          {error && <div className="alert alert-danger p-2">{error}</div>}
 
-            <form onSubmit={handleLogin}>
-              <div className="mb-3">
-                <label className="form-label">Correo electrónico</label>
-                <input
-                  type="email"
-                  className="form-control"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="nombre@ejemplo.com"
-                  required
-                />
-              </div>
+          <form onSubmit={handleLogin}>
+            <div className="mb-3">
+              <label className="auth-label">Correo electrónico</label>
+              <input
+                type="email"
+                className="form-control auth-input"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="nombre@ejemplo.com"
+                required
+              />
+            </div>
 
-              <div className="mb-3">
-                <label className="form-label">Contraseña</label>
-                <input
-                  type="password"
-                  className="form-control"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="********"
-                  required
-                />
-              </div>
+            <div className="mb-3">
+              <label className="auth-label">Contraseña</label>
+              <input
+                type="password"
+                className="form-control auth-input"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="********"
+                required
+              />
+            </div>
 
-              <button type="submit" className="btn btn-primary w-100">
-                Iniciar sesión
-              </button>
-            </form>
-          </div>
+            <button type="submit" className="btn auth-btn">
+              Iniciar sesión
+            </button>
+          </form>
+
+          <p className="auth-link-text text-center mt-4 mb-0">
+            ¿No tienes cuenta?{" "}
+            <Link to="/register" className="auth-link">
+              Regístrate
+            </Link>
+          </p>
         </div>
       </div>
     </div>

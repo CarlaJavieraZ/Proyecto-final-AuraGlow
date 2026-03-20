@@ -1,6 +1,7 @@
 import React from "react";
 import { useCart } from "../../context/CartContext";
 import { useWishlist } from "../../context/WishlistContext";
+import { Link } from "react-router-dom";
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
@@ -18,14 +19,22 @@ const ProductCard = ({ product }) => {
 
   return (
     <div className="card h-100 shadow-sm border-0 product-card mx-auto">
-      <img
-        src={product.image}
-        className="card-img-top product-card-image"
-        alt={product.name}
-      />
+      <Link to={`/product/${product._id}`}>
+        <img
+          src={product.image}
+          className="card-img-top product-card-image"
+          alt={product.name}
+          style={{ cursor: "pointer" }}
+        />
+      </Link>
 
       <div className="card-body d-flex flex-column">
-        <h5 className="card-title product-card-title">{product.name}</h5>
+        <Link
+          to={`/product/${product._id}`}
+          className="text-decoration-none text-dark"
+        >
+          <h5 className="card-title product-card-title">{product.name}</h5>
+        </Link>
 
         <p className="card-text product-card-description">
           {product.description}
