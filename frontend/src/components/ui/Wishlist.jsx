@@ -17,9 +17,10 @@ const Wishlist = () => {
               Aún no has agregado productos a tu lista de deseados.
             </p>
 
-            <div className="py-4">
-              <div style={{ fontSize: "3rem" }}>♡</div>
-              <p className="wishlist-empty-text">
+            <div className="empty-state-box">
+              <div className="empty-state-icon">♡</div>
+              <h4 className="empty-state-title">Tu lista está vacía</h4>
+              <p className="empty-state-text mb-3">
                 Guarda aquí tus productos favoritos de Aura Glow.
               </p>
 
@@ -37,13 +38,17 @@ const Wishlist = () => {
     <div className="wishlist-page">
       <div className="container py-5">
         <div className="wishlist-box">
-          <div className="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+          <div className="section-header">
             <div>
               <h2 className="wishlist-title mb-1">Mis deseados</h2>
               <p className="wishlist-subtitle mb-0">
                 Tus favoritos guardados para después
               </p>
             </div>
+
+            <span className="section-chip">
+              {wishlist.length} producto{wishlist.length !== 1 ? "s" : ""}
+            </span>
           </div>
 
           <div className="row g-4">
@@ -76,7 +81,7 @@ const Wishlist = () => {
                       </button>
 
                       <button
-                        className="btn wishlist-remove-btn"
+                        className="wishlist-remove-btn"
                         onClick={() => removeFromWishlist(item._id)}
                       >
                         Eliminar de deseados

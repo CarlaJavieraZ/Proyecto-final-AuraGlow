@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useWishlist } from "../context/WishlistContext";
 import { useCart } from "../context/CartContext";
+import { Link } from "react-router-dom";
 
 const Profile = () => {
   const { user, logout } = useAuth();
@@ -9,50 +10,56 @@ const Profile = () => {
   const { addToCart } = useCart();
 
   const [profileImage, setProfileImage] = useState(null);
+  const [purchases, setPurchases] = useState([]);
 
   useEffect(() => {
-    const savedImage = localStorage.getItem("profileImage");
+    if (!user?.email) return;
+
+    const savedImage = localStorage.getItem(`profileImage_${user.email}`);
     if (savedImage) {
       setProfileImage(savedImage);
     }
-  }, []);
+
+    const savedPurchases = localStorage.getItem(`aura_purchases_${user.email}`);
+    if (savedPurchases) {
+      setPurchases(JSON.parse(savedPurchases));
+    } else {
+      setPurchases([]);
+    }
+  }, [user]);
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
+    if (!file || !user?.email) return;
+
     const reader = new FileReader();
 
     reader.onloadend = () => {
       setProfileImage(reader.result);
-      localStorage.setItem("profileImage", reader.result);
+      localStorage.setItem(`profileImage_${user.email}`, reader.result);
     };
 
-    if (file) {
-      reader.readAsDataURL(file);
-    }
+    reader.readAsDataURL(file);
   };
 
-  // Compras de ejemplo por ahora
-  const purchases = [
-    {
-      _id: "c1",
-      name: "Set de Skincare Aura Glow",
-      price: 35990,
-      image: "/images/products/jabon.jpg",
-      date: "12-03-2026",
-    },
-    {
-      _id: "c2",
-      name: "Serum Hidratante",
-      price: 18990,
-      image: "/images/products/jabon.jpg",
-      date: "05-03-2026",
-    },
-  ];
+  const handleImageError = (e) => {
+    e.target.style.display = "none";
+  };
 
   if (!user) {
     return (
-      <div className="container py-5 text-center">
-        <p>No estás autenticado. Por favor, inicia sesión.</p>
+      <div className="profile-page">
+        <div className="container py-5">
+          <div className="profile-box text-center">
+            <h2 className="profile-title mb-3">Mi perfil</h2>
+            <p className="profile-empty-text mb-3">
+              No estás autenticado. Por favor, inicia sesión.
+            </p>
+            <Link to="/login" className="btn profile-cart-btn">
+              Ir a iniciar sesión
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }
@@ -72,7 +79,7 @@ const Profile = () => {
                   />
                 ) : (
                   <div className="profile-avatar-placeholder">
-                    {user.nombre?.charAt(0)}
+                    {user.nombre?.charAt(0)?.toUpperCase() || "U"}
                   </div>
                 )}
 
@@ -86,12 +93,29 @@ const Profile = () => {
             </div>
 
             <div className="col-md-8">
-              <h2 className="profile-title mb-4">Mi Perfil</h2>
+              <h2 className="profile-title mb-4">Mi perfil</h2>
 
               <div className="profile-user-info">
-                <p><strong>Nombre:</strong> {user.nombre}</p>
-                {user.email && <p><strong>Correo:</strong> {user.email}</p>}
-                {user.username && <p><strong>Usuario:</strong> {user.username}</p>}
+                <p>
+                  <strong>Nombre:</strong> {user.nombre || "Sin nombre"}
+                </p>
+
+                {user.email && (
+                  <p>
+                    <strong>Correo:</strong> {user.email}
+                  </p>
+                )}
+
+                {user.username && (
+                  <p>
+                    <strong>Usuario:</strong> {user.username}
+                  </p>
+                )}
+
+                <p>
+                  <strong>Rol:</strong>{" "}
+                  {user.role === "admin" ? "Administrador" : "Cliente"}
+                </p>
               </div>
 
               <button className="btn profile-logout-btn mt-2" onClick={logout}>
@@ -102,12 +126,21 @@ const Profile = () => {
         </div>
 
         <div className="profile-box mb-5">
-          <h3 className="profile-title mb-4">Mis deseados</h3>
+          <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+            <h3 className="profile-title mb-0">Mis deseados</h3>
+            <span className="profile-section-count">
+              {wishlist.length} producto{wishlist.length !== 1 ? "s" : ""}
+            </span>
+          </div>
 
           {wishlist.length === 0 ? (
-            <p className="profile-empty-text">
-              Aún no tienes productos guardados en tu lista de deseados.
-            </p>
+            <div className="empty-state-box">
+              <div className="empty-state-icon">♡</div>
+              <h4 className="empty-state-title">No tienes deseados guardados</h4>
+              <p className="empty-state-text">
+                Aquí aparecerán los productos que marques como favoritos.
+              </p>
+            </div>
           ) : (
             <div className="row g-4">
               {wishlist.map((item) => (
@@ -117,9 +150,16 @@ const Profile = () => {
                       src={item.image}
                       className="profile-wishlist-image"
                       alt={item.name}
+                      onError={handleImageError}
                     />
 
                     <h5 className="profile-product-name mt-3">{item.name}</h5>
+
+                    {item.description && (
+                      <p className="profile-product-description mb-2">
+                        {item.description}
+                      </p>
+                    )}
 
                     <p className="profile-product-price">
                       {Number(item.price).toLocaleString("es-CL", {
@@ -151,22 +191,43 @@ const Profile = () => {
         </div>
 
         <div className="profile-box">
-          <h3 className="profile-title mb-4">Mis compras</h3>
+          <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+            <h3 className="profile-title mb-0">Mis compras</h3>
+            <span className="profile-section-count">
+              {purchases.length} compra{purchases.length !== 1 ? "s" : ""}
+            </span>
+          </div>
 
           {purchases.length === 0 ? (
-            <p className="profile-empty-text">
-              Aún no tienes compras registradas.
-            </p>
+            <div>
+              <div className="empty-state-box mb-3">
+                <div className="empty-state-icon">🧾</div>
+                <h4 className="empty-state-title">Aún no tienes compras</h4>
+                <p className="empty-state-text">
+                  Cuando completes una compra, aparecerá aquí tu historial.
+                </p>
+              </div>
+              <Link to="/" className="btn profile-cart-btn">
+                Ir a comprar
+              </Link>
+            </div>
           ) : (
             <div className="row g-4">
               {purchases.map((item) => (
                 <div className="col-md-6 col-lg-4" key={item._id}>
                   <div className="profile-purchase-card h-100">
-                    <img
-                      src={item.image}
-                      className="profile-purchase-image"
-                      alt={item.name}
-                    />
+                    {item.image ? (
+                      <img
+                        src={item.image}
+                        className="profile-purchase-image"
+                        alt={item.name}
+                        onError={handleImageError}
+                      />
+                    ) : (
+                      <div className="profile-purchase-image profile-image-fallback">
+                        Aura Glow
+                      </div>
+                    )}
 
                     <h5 className="profile-product-name mt-3">{item.name}</h5>
 

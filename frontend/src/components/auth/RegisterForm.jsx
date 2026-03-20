@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router-dom";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -14,6 +14,7 @@ const Register = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setError("");
 
     if (password !== confirmPassword) {
       setError("Las contraseñas no coinciden");
@@ -23,8 +24,6 @@ const Register = () => {
     const response = register({ email, password, nombre });
 
     if (response.success) {
-      console.log("Usuario creado con éxito. Ahora puedes iniciar sesión.");
-
       setEmail("");
       setPassword("");
       setConfirmPassword("");
@@ -36,74 +35,93 @@ const Register = () => {
   };
 
   return (
-    <div className="container mt-5">
-      <div className="card p-4 shadow-sm mx-auto" style={{ maxWidth: "400px" }}>
-        <h2 className="text-center mb-4">Registrarse</h2>
+    <div className="auth-page">
+      <div className="container py-5">
+        <div className="auth-box">
+          <h2 className="auth-title mb-2 text-center">Crear cuenta</h2>
+          <p className="auth-subtitle mb-4 text-center">
+            Regístrate para guardar tus favoritos y continuar tus compras.
+          </p>
 
-        {error && (
-          <div className="alert alert-danger p-2" role="alert">
-            {error}
-          </div>
-        )}
+          {error && (
+            <div className="alert alert-danger p-2" role="alert">
+              {error}
+            </div>
+          )}
 
-        <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label className="auth-label" htmlFor="nombre">
+                Nombre
+              </label>
+              <input
+                type="text"
+                className="form-control auth-input"
+                id="nombre"
+                placeholder="Ingresa tu nombre"
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+                required
+              />
+            </div>
 
-          <div className="mb-3">
-            <label className="form-label">Nombre</label>
-            <input
-              type="text"
-              className="form-control"
-              id="nombre"
-              placeholder="Ingrese su nombre"
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
-              required
-            />
-          </div>
+            <div className="mb-3">
+              <label className="auth-label" htmlFor="email">
+                Correo electrónico
+              </label>
+              <input
+                type="email"
+                className="form-control auth-input"
+                id="email"
+                placeholder="nombre@ejemplo.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
 
-          <div className="mb-3">
-            <label className="form-label" htmlFor="email">Correo electrónico</label>
-            <input
-              type="email"
-              className="form-control"
-              id="email"
-              placeholder="Ingrese su correo"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
+            <div className="mb-3">
+              <label className="auth-label" htmlFor="password">
+                Contraseña
+              </label>
+              <input
+                type="password"
+                className="form-control auth-input"
+                id="password"
+                placeholder="Crea una contraseña"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
 
-          <div className="mb-3">
-            <label className="form-label" htmlFor="password">Contraseña</label>
-            <input
-              type="password"
-              className="form-control"
-              id="password"
-              placeholder="Ingrese su contraseña"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+            <div className="mb-3">
+              <label className="auth-label" htmlFor="confirmPassword">
+                Confirmar contraseña
+              </label>
+              <input
+                type="password"
+                className="form-control auth-input"
+                id="confirmPassword"
+                placeholder="Confirma tu contraseña"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+            </div>
 
-          <div className="mb-3">
-            <label className="form-label" htmlFor="confirmPassword">Confirmar Contraseña</label>
-            <input
-              type="password"
-              className="form-control"
-              id="confirmPassword"
-              placeholder="Confirme su contraseña"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
-          </div>
+            <button type="submit" className="btn auth-btn">
+              Registrarse
+            </button>
+          </form>
 
-          <button type="submit" className="btn btn-primary w-100">
-            Registrarse
-          </button>
-        </form>
+          <p className="auth-link-text text-center mt-4 mb-0">
+            ¿Ya tienes cuenta?{" "}
+            <Link to="/login" className="auth-link">
+              Inicia sesión
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

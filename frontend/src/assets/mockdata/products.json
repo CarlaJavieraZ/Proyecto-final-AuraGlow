@@ -3,61 +3,68 @@
     "_id": "69addc89a5a59c05d29ce946",
     "index": 0,
     "guid": "3a257625-f19e-4ab9-be0c-d837f6225b28",
-    "description": "Jabon hidratanta para todo tipo de piel.\r\n",
+    "description": "Jabon hidratanta para todo tipo de piel.",
     "price": 25990,
     "name": "Jabon AuraGlow",
     "image": "/images/products/jabonRostro.png",
-    "url": "/"
+    "url": "/",
+    "category": "Jabones"
   },
   {
     "_id": "69addc89b3b0432d585dc3e7",
     "index": 1,
     "guid": "c0aa2527-f522-4c58-9f73-0ebb56a23be2",
-    "description": "Tonico hidratante para todo tipo de piel.\r\n",
+    "description": "Tonico hidratante para todo tipo de piel.",
     "price": 20990,
     "name": "Tonico AuraGlow",
     "image": "/images/products/tonicorostro.png",
-    "url": "/"
+    "url": "/",
+    "category": "Tonicos"
   },
   {
     "_id": "69addc890c202b214ec3a4e6",
     "index": 2,
     "guid": "3097689b-5c91-428c-9568-150700914d1b",
-    "description": "Serum hidratante para todo tipo de piel\r\n",
+    "description": "Serum hidratante para todo tipo de piel",
     "price": 30990,
     "name": "Serum AuraGlow",
     "image": "/images/products/serumrostro.png",
-    "url": "/"
+    "url": "/",
+    "category": "Serums"
   },
   {
     "_id": "69addc896dadea05eb0f1d8e",
     "index": 3,
     "guid": "0a0553cb-7b4a-4de4-a518-c966d967cef0",
-    "description": "Crema Hidratante para todo tipo de piel.\r\n",
+    "description": "Crema Hidratante para todo tipo de piel.",
     "price": 28990,
     "name": "Crema AuraGlow",
     "image": "/images/products/cremarostro.png",
-    "url": "/"
+    "url": "/",
+    "category": "Cremas"
   },
-   {
+  {
     "_id": "5",
     "name": "Jabon Facial",
     "price": 15990,
     "description": "Limpiador suave para el rostro",
-    "image": "/images/productsmusthave/tonic.jpg"
+    "image": "/images/productsmusthave/tonic.jpg",
+    "category": "Jabones"
   },
   {
     "_id": "6",
     "name": "Serum para poros",
     "price": 12990,
     "description": "Reduce los poros",
-    "image": "/images/productsmusthave/serum.jpg"
+    "image": "/images/productsmusthave/serum.jpg",
+    "category": "Serums"
   },
   {
     "_id": "7",
-    "name": "Crema facial ",
+    "name": "Crema facial",
     "price": 12990,
     "description": "Crema de perlas",
-    "image": "/images/productsmusthave/cream.jpg"
+    "image": "/images/productsmusthave/cream.jpg",
+    "category": "Cremas"
   }
 ]

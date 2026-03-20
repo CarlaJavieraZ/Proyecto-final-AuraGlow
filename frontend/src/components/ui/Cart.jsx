@@ -1,14 +1,11 @@
 import React from "react";
 import { useCart } from "../../context/CartContext";
-
+import { FaTrash } from "react-icons/fa";
 
 const Cart = () => {
-    const { cart, addToCart, removeFromCart, clearCart } = useCart();
+    const { cart, addToCart, removeFromCart, deleteFromCart, clearCart } = useCart();
 
-    const total = cart.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0
-    );
+    const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
     if (cart.length === 0) {
         return (
@@ -19,8 +16,12 @@ const Cart = () => {
                         <p className="cart-subtitle mb-4">
                             Agrega tus productos favoritos y arma tu rutina Aura Glow ✨
                         </p>
-                        <div className="mt-3">
-                            <p className="mb-0">Todavía no has agregado productos.</p>
+                        <div className="empty-state-box mt-3">
+                            <div className="empty-state-icon">🛒</div>
+                            <h4 className="empty-state-title">Aún no tienes productos</h4>
+                            <p className="empty-state-text">
+                                Explora Aura Glow y agrega tus favoritos al carrito.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -40,7 +41,14 @@ const Cart = () => {
                             </p>
                         </div>
 
-                        <button className="btn cart-clear-btn" onClick={clearCart}>
+                        <button
+                            className="btn cart-clear-btn"
+                            onClick={() => {
+                                if (window.confirm("¿Seguro que quieres vaciar el carrito?")) {
+                                    clearCart();
+                                }
+                            }}
+                        >
                             Vaciar carrito
                         </button>
                     </div>
@@ -94,6 +102,13 @@ const Cart = () => {
                                                     Subtotal: $
                                                     {(item.price * item.quantity).toLocaleString("es-CL")}
                                                 </p>
+
+                                                <button
+                                                    className="cart-remove-item-btn"
+                                                    onClick={() => deleteFromCart(item._id)}
+                                                >
+                                                    <FaTrash /> Eliminar
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
