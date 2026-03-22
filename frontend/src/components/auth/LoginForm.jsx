@@ -10,16 +10,16 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
 
-    const success = login(email, password);
+    const result = await login(email, password);
 
-    if (success) {
+    if (result.success) {
       navigate("/");
     } else {
-      setError("Correo o contraseña incorrectos.");
+      setError(result.message || "Correo o contraseña incorrectos.");
     }
   };
 
