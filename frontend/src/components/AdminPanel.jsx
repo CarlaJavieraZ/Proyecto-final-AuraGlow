@@ -137,7 +137,7 @@ const AdminPanel = () => {
         if (!confirmDelete) return;
 
         try {
-            const token = localStorage.getItem("token"); // revisa el nombre real
+            const token = localStorage.getItem("token"); 
 
             const res = await fetch(`${API_URL}/api/products/${id}`, {
                 method: "DELETE",

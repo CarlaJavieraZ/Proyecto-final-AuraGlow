@@ -7,11 +7,11 @@ const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
-  const wished = isInWishlist(product._id);
+  const wished = isInWishlist(product.id);
 
   const handleWishlist = () => {
     if (wished) {
-      removeFromWishlist(product._id);
+      removeFromWishlist(product.id);
     } else {
       addToWishlist(product);
     }
@@ -19,25 +19,25 @@ const ProductCard = ({ product }) => {
 
   return (
     <div className="card h-100 shadow-sm border-0 product-card mx-auto">
-      <Link to={`/product/${product._id}`}>
+      <Link to={`/product/${product.id}`}>
         <img
-          src={product.image}
+          src={product.imagen_url}
           className="card-img-top product-card-image"
-          alt={product.name}
+          alt={product.nombre}
           style={{ cursor: "pointer" }}
         />
       </Link>
 
       <div className="card-body d-flex flex-column">
         <Link
-          to={`/product/${product._id}`}
+          to={`/product/${product.id}`}
           className="text-decoration-none text-dark"
         >
-          <h5 className="card-title product-card-title">{product.name}</h5>
+          <h5 className="card-title product-card-title">{product.nombre}</h5>
         </Link>
 
         <p className="card-text product-card-description">
-          {product.description}
+          {product.descripcion}
         </p>
 
         <p className="product-card-price mb-3">
@@ -50,7 +50,7 @@ const ProductCard = ({ product }) => {
         <div className="d-grid gap-2 mt-auto">
           <button
             className="btn product-cart-btn"
-            onClick={() => addToCart(product)}
+            onClick={() => addToCart(product.id || product.product_id, 1)}
           >
             Agregar al carrito
           </button>

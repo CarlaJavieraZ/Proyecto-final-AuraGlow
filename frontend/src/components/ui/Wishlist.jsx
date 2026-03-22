@@ -4,7 +4,7 @@ import { useCart } from "../../context/CartContext";
 import { Link } from "react-router-dom";
 
 const Wishlist = () => {
-  const { wishlist, removeFromWishlist } = useWishlist();
+  const { wishlist = [], removeFromWishlist } = useWishlist();
   const { addToCart } = useCart();
 
   if (wishlist.length === 0) {
@@ -52,45 +52,53 @@ const Wishlist = () => {
           </div>
 
           <div className="row g-4">
-            {wishlist.map((item) => (
-              <div className="col-md-6 col-lg-4" key={item._id}>
-                <div className="wishlist-item-card h-100">
-                  <div className="text-center">
-                    <img
-                      src={item.image}
-                      className="wishlist-item-image"
-                      alt={item.name}
-                    />
-                  </div>
+            {wishlist.map((item) => {
+              const productId = item.product_id || item.id;
 
-                  <div className="mt-3">
-                    <h5 className="wishlist-item-name">{item.name}</h5>
-                    <p className="wishlist-item-description">
-                      {item.description}
-                    </p>
-                    <p className="wishlist-item-price mb-3">
-                      ${Number(item.price).toLocaleString("es-CL")}
-                    </p>
+              return (
+                <div className="col-md-6 col-lg-4" key={productId}>
+                  <div className="wishlist-item-card h-100">
+                    <div className="text-center">
+                      <img
+                        src={item.imagen_url}
+                        className="wishlist-item-image"
+                        alt={item.nombre}
+                      />
+                    </div>
 
-                    <div className="d-grid gap-2">
-                      <button
-                        className="btn wishlist-cart-btn"
-                        onClick={() => addToCart(item)}
-                      >
-                        Agregar al carrito
-                      </button>
+                    <div className="mt-3">
+                      <h5 className="wishlist-item-name">{item.nombre}</h5>
 
-                      <button
-                        className="wishlist-remove-btn"
-                        onClick={() => removeFromWishlist(item._id)}
-                      >
-                        Eliminar de deseados
-                      </button>
+                      {item.descripcion && (
+                        <p className="wishlist-item-description">
+                          {item.descripcion}
+                        </p>
+                      )}
+
+                      <p className="wishlist-item-price mb-3">
+                        ${Number(item.precio || 0).toLocaleString("es-CL")}
+                      </p>
+
+                      <div className="d-grid gap-2">
+                        <button
+                          className="btn wishlist-cart-btn"
+                          onClick={() => addToCart(productId, 1)}
+                        >
+                          Agregar al carrito
+                        </button>
+
+                        <button
+                          className="wishlist-remove-btn"
+                          onClick={() => removeFromWishlist(productId)}
+                        >
+                          Eliminar de deseados
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
