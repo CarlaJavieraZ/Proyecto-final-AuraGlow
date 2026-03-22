@@ -17,12 +17,13 @@ const normalizeWishlistResponse = (data) => {
     : data.items || data.wishlist || data.favorites || [];
 
   return rawItems.map((item) => ({
-    id: item.id ?? item.product_id,
+    id: item.product_id ?? item.id,
     product_id: item.product_id ?? item.id,
     nombre: item.nombre ?? item.name ?? "Producto",
     precio: Number(item.precio ?? item.price ?? 0),
-    imagen_url: item.imagen_url ?? item.image ?? "",
+    imagen_url: item.imagen_url ?? item.image_url ?? item.image ?? "",
     descripcion: item.descripcion ?? item.description ?? "",
+    categoria: item.categoria ?? item.category ?? "",
   }));
 };
 

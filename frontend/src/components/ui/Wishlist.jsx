@@ -53,52 +53,58 @@ const Wishlist = () => {
 
           <div className="row g-4">
             {wishlist.map((item) => {
-              const productId = item.product_id || item.id;
+  const productId = item.product_id || item.id;
+  const productName = item.nombre ?? item.name ?? "Producto";
+  const productDescription =
+    item.descripcion ?? item.description ?? "";
+  const productImage =
+    item.imagen_url ?? item.image_url ?? item.image ?? "";
+  const productPrice = Number(item.precio ?? item.price ?? 0);
 
-              return (
-                <div className="col-md-6 col-lg-4" key={productId}>
-                  <div className="wishlist-item-card h-100">
-                    <div className="text-center">
-                      <img
-                        src={item.imagen_url}
-                        className="wishlist-item-image"
-                        alt={item.nombre}
-                      />
-                    </div>
+  return (
+    <div className="col-md-6 col-lg-4" key={productId}>
+      <div className="wishlist-item-card h-100">
+        <div className="text-center">
+          <img
+            src={productImage}
+            className="wishlist-item-image"
+            alt={productName}
+          />
+        </div>
 
-                    <div className="mt-3">
-                      <h5 className="wishlist-item-name">{item.nombre}</h5>
+        <div className="mt-3">
+          <h5 className="wishlist-item-name">{productName}</h5>
 
-                      {item.descripcion && (
-                        <p className="wishlist-item-description">
-                          {item.descripcion}
-                        </p>
-                      )}
+          {productDescription && (
+            <p className="wishlist-item-description">
+              {productDescription}
+            </p>
+          )}
 
-                      <p className="wishlist-item-price mb-3">
-                        ${Number(item.precio || 0).toLocaleString("es-CL")}
-                      </p>
+          <p className="wishlist-item-price mb-3">
+            ${productPrice.toLocaleString("es-CL")}
+          </p>
 
-                      <div className="d-grid gap-2">
-                        <button
-                          className="btn wishlist-cart-btn"
-                          onClick={() => addToCart(productId, 1)}
-                        >
-                          Agregar al carrito
-                        </button>
+          <div className="d-grid gap-2">
+            <button
+              className="btn wishlist-cart-btn"
+              onClick={() => addToCart(productId, 1)}
+            >
+              Agregar al carrito
+            </button>
 
-                        <button
-                          className="wishlist-remove-btn"
-                          onClick={() => removeFromWishlist(productId)}
-                        >
-                          Eliminar de deseados
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            <button
+              className="wishlist-remove-btn"
+              onClick={() => removeFromWishlist(productId)}
+            >
+              Eliminar de deseados
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+})}
           </div>
         </div>
       </div>

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 
 const AdminPanel = () => {
     const { user } = useAuth();
@@ -11,14 +13,12 @@ const AdminPanel = () => {
 
     const [formData, setFormData] = useState({
         nombre: "",
-        precio: "",
+        precio: 0,
         descripcion: "",
         imagen_url: "",
         categoria: "",
         stock: "",
     });
-
-    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -46,7 +46,7 @@ const AdminPanel = () => {
     const resetForm = () => {
         setFormData({
             nombre: "",
-            precio: "",
+            precio: 0,
             descripcion: "",
             imagen_url: "",
             categoria: "",
@@ -72,7 +72,7 @@ const AdminPanel = () => {
         }
 
         try {
-            const token = localStorage.getItem("token"); 
+            const token = localStorage.getItem("token");
 
             const payload = {
                 nombre: formData.nombre,
@@ -119,7 +119,7 @@ const AdminPanel = () => {
     const handleEdit = (product) => {
         setFormData({
             nombre: product.nombre || "",
-            precio: product.precio || "",
+            precio: product.precio || 0,
             descripcion: product.descripcion || "",
             imagen_url: product.imagen_url || "",
             categoria: product.categoria || "",
@@ -137,7 +137,7 @@ const AdminPanel = () => {
         if (!confirmDelete) return;
 
         try {
-            const token = localStorage.getItem("token"); 
+            const token = localStorage.getItem("token");
 
             const res = await fetch(`${API_URL}/api/products/${id}`, {
                 method: "DELETE",
@@ -254,14 +254,14 @@ const AdminPanel = () => {
                         </div>
 
                         <div className="d-flex gap-2 flex-wrap mt-4">
-                            <button type="submit" className="btn admin-add-btn">
+                            <button type="submit" className="admin-add-btn">
                                 {isEditing ? "Guardar cambios" : "+ Agregar producto"}
                             </button>
 
                             {isEditing && (
                                 <button
                                     type="button"
-                                    className="btn admin-edit-btn"
+                                    className="admin-edit-btn"
                                     onClick={resetForm}
                                 >
                                     Cancelar
@@ -303,7 +303,7 @@ const AdminPanel = () => {
                                         </td>
                                         <td>{product.nombre}</td>
                                         <td>
-                                            {Number(product.price).toLocaleString("es-CL", {
+                                            {Number(product.precio).toLocaleString("es-CL", {
                                                 style: "currency",
                                                 currency: "CLP",
                                             })}
@@ -311,15 +311,18 @@ const AdminPanel = () => {
                                         <td>{product.descripcion}</td>
                                         <td>{product.categoria}</td>
                                         <td>
-                                            <div className="d-flex gap-2 flex-wrap">
+                                            <div className="admin-actions">
                                                 <button
-                                                    className="btn admin-edit-btn"
+                                                    type="button"
+                                                    className="admin-edit-btn"
                                                     onClick={() => handleEdit(product)}
                                                 >
                                                     Editar
                                                 </button>
+
                                                 <button
-                                                    className="btn admin-delete-btn"
+                                                    type="button"
+                                                    className="admin-delete-btn"
                                                     onClick={() => handleDelete(product.id)}
                                                 >
                                                     Eliminar
@@ -331,11 +334,6 @@ const AdminPanel = () => {
                             </tbody>
                         </table>
                     </div>
-
-                    <p className="admin-note mt-3 mb-0">
-                        Los cambios se guardan en localStorage para simular una gestión real
-                        de productos en frontend.
-                    </p>
                 </div>
             </div>
         </div>

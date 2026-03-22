@@ -6,13 +6,14 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [nombre, setNombre] = useState("");
+  const [apellido, setApellido] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
 
   const { register } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -21,12 +22,19 @@ const Register = () => {
       return;
     }
 
-    const response = register({ email, password, nombre });
+    const response = await register({
+      nombre,
+      apellido,
+      email,
+      password,
+    });
 
     if (response.success) {
       setEmail("");
       setPassword("");
       setConfirmPassword("");
+      setNombre("");
+      setApellido("");
       setError("");
       navigate("/login");
     } else {
@@ -61,6 +69,21 @@ const Register = () => {
                 placeholder="Ingresa tu nombre"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="auth-label" htmlFor="apellido">
+                Apellido
+              </label>
+              <input
+                type="text"
+                className="form-control auth-input"
+                id="apellido"
+                placeholder="Ingresa tu apellido"
+                value={apellido}
+                onChange={(e) => setApellido(e.target.value)}
                 required
               />
             </div>

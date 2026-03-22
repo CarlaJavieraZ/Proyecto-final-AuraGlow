@@ -1,5 +1,7 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
+
 const formatPrice = (value) => {
   return Number(value || 0).toLocaleString("es-CL");
 };
@@ -117,9 +119,9 @@ const Cart = () => {
                 <span>${formatPrice(total)}</span>
               </div>
 
-              <button className="btn btn-dark w-100 mt-4 rounded-pill">
+              <Link to="/checkout" className="btn btn-dark w-100 mt-4 rounded-pill">
                 Ir a pagar
-              </button>
+              </Link>
             </div>
           </div>
         </div>

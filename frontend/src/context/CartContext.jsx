@@ -6,6 +6,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
+import { useAuth } from "./AuthContext";
 
 const CartContext = createContext();
 
@@ -13,7 +14,6 @@ const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
 const getErrorMessage = (payload, status) => {
   if (!payload) return `Error HTTP ${status}`;
-
   if (typeof payload === "string") return payload;
 
   return (
@@ -62,7 +62,7 @@ export const CartProvider = ({ children }) => {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const token = localStorage.getItem("token");
+  const { token, isAuthenticated } = useAuth();
 
   const authFetch = useCallback(
     async (endpoint, options = {}) => {
@@ -99,7 +99,7 @@ export const CartProvider = ({ children }) => {
   );
 
   const fetchCart = useCallback(async () => {
-    if (!token) {
+    if (!isAuthenticated || !token) {
       setCartItems([]);
       setTotal(0);
       return;
@@ -120,7 +120,7 @@ export const CartProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [authFetch, token]);
+  }, [authFetch, token, isAuthenticated]);
 
   useEffect(() => {
     fetchCart();
@@ -128,22 +128,18 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = async (productId, quantity = 1) => {
     try {
-      if (!token) {
-        throw new Error("Debes iniciar sesión para agregar productos al carrito");
+      if (!isAuthenticated || !token) {
+        alert("Debes iniciar sesión para agregar productos al carrito");
+        return { success: false };
       }
 
       if (!productId) {
-        throw new Error("No se encontró el ID del producto");
+        alert("No se encontró el ID del producto");
+        return { success: false };
       }
 
       const numericProductId = Number(productId);
       const numericQuantity = Number(quantity) || 1;
-
-      console.log("Enviando al carrito:", {
-        productId: numericProductId,
-        quantity: numericQuantity,
-        tokenExists: !!token,
-      });
 
       await authFetch("/cart", {
         method: "POST",
@@ -155,9 +151,17 @@ export const CartProvider = ({ children }) => {
       });
 
       await fetchCart();
+      return { success: true };
     } catch (error) {
       console.error("Error al agregar al carrito:", error.message);
-      throw error;
+
+      if (error.message?.toLowerCase().includes("stock")) {
+        alert("La cantidad solicitada supera el stock disponible");
+      } else {
+        alert(error.message || "No se pudo agregar al carrito");
+      }
+
+      return { success: false, message: error.message };
     }
   };
 
@@ -167,8 +171,7 @@ export const CartProvider = ({ children }) => {
       const numericQuantity = Number(newQuantity);
 
       if (numericQuantity <= 0) {
-        await removeFromCart(numericProductId);
-        return;
+        return await removeFromCart(numericProductId);
       }
 
       await authFetch(`/cart/${numericProductId}`, {
@@ -179,9 +182,17 @@ export const CartProvider = ({ children }) => {
       });
 
       await fetchCart();
+      return { success: true };
     } catch (error) {
       console.error("Error al actualizar cantidad:", error.message);
-      throw error;
+
+      if (error.message?.toLowerCase().includes("stock")) {
+        alert("La cantidad solicitada supera el stock disponible");
+      } else {
+        alert(error.message || "No se pudo actualizar la cantidad");
+      }
+
+      return { success: false, message: error.message };
     }
   };
 
@@ -194,9 +205,11 @@ export const CartProvider = ({ children }) => {
       });
 
       await fetchCart();
+      return { success: true };
     } catch (error) {
       console.error("Error al eliminar producto:", error.message);
-      throw error;
+      alert(error.message || "No se pudo eliminar el producto");
+      return { success: false, message: error.message };
     }
   };
 
@@ -208,9 +221,11 @@ export const CartProvider = ({ children }) => {
 
       setCartItems([]);
       setTotal(0);
+      return { success: true };
     } catch (error) {
       console.error("Error al vaciar carrito:", error.message);
-      throw error;
+      alert(error.message || "No se pudo vaciar el carrito");
+      return { success: false, message: error.message };
     }
   };
 

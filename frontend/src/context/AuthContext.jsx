@@ -2,7 +2,7 @@ import React, { createContext, useState, useContext } from "react";
 
 const AuthContext = createContext();
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem("token") || null);
@@ -11,6 +11,38 @@ const AuthProvider = ({ children }) => {
     const savedUser = localStorage.getItem("aura_active_user");
     return savedUser ? JSON.parse(savedUser) : null;
   });
+
+  const register = async ({ nombre, apellido, email, password }) => {
+    try {
+      const res = await fetch(`${API_URL}/api/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ nombre, apellido, email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        return {
+          success: false,
+          message: data.error || data.message || "Error al registrarse",
+        };
+      }
+
+      return {
+        success: true,
+        message: data.message || "Usuario registrado correctamente",
+      };
+    } catch (error) {
+      console.error("Error en register:", error);
+      return {
+        success: false,
+        message: "No se pudo conectar con el servidor",
+      };
+    }
+  };
 
   const login = async (email, password) => {
     try {
@@ -36,9 +68,9 @@ const AuthProvider = ({ children }) => {
 
       const normalizedUser = receivedUserRaw
         ? {
-          ...receivedUserRaw,
-          role: receivedUserRaw.role ?? receivedUserRaw.rol ?? "user",
-        }
+            ...receivedUserRaw,
+            role: receivedUserRaw.role ?? receivedUserRaw.rol ?? "user",
+          }
         : null;
 
       if (!receivedToken) {
@@ -82,6 +114,7 @@ const AuthProvider = ({ children }) => {
         user,
         token,
         login,
+        register,
         logout,
         isAuthenticated: !!token,
       }}

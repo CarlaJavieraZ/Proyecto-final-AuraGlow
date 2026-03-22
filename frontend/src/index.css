@@ -952,44 +952,104 @@ button,
   padding: 0.2rem;
 }
 
-.admin-add-btn {
-  background: linear-gradient(135deg, #f3b6ca, #ec9fbd);
-  border: none;
-  color: white;
-  font-weight: 600;
-  border-radius: 14px;
-  padding: 0.7rem 1rem;
+.admin-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 130px;
 }
 
-.admin-add-btn:hover {
-  background: linear-gradient(135deg, #ec9fbd, #e889ad);
-  color: white;
+.admin-edit-btn,
+.admin-delete-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  text-decoration: none;
 }
 
 .admin-edit-btn {
-  background: white;
-  border: 1px solid #efbfd1;
-  color: #c85f86;
-  border-radius: 12px;
-  font-weight: 600;
+  background-color: #f4b6cc;
+  color: #7a3652;
+  border: 1px solid #ef9fbc;
 }
 
 .admin-edit-btn:hover {
-  background: #fff1f6;
-  color: #b64d77;
+  background-color: #eaa8c0;
+  color: #6a2744;
+  transform: translateY(-1px);
 }
 
 .admin-delete-btn {
-  background: #fde7ef;
-  border: 1px solid #efbfd1;
-  color: #c14976;
-  border-radius: 12px;
-  font-weight: 600;
+  background-color: #fff1f4;
+  color: #c7547a;
+  border: 1px solid #f2bfd0;
 }
 
 .admin-delete-btn:hover {
-  background: #fadbe7;
-  color: #b03d69;
+  background-color: #ffdce6;
+  color: #b13e65;
+  transform: translateY(-1px);
+}
+
+.admin-edit-btn:focus,
+.admin-delete-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(232, 168, 192, 0.35);
+}
+
+.admin-add-btn,
+.admin-cancel-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 180px;
+  border-radius: 14px;
+  padding: 12px 18px;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 6px 16px rgba(232, 180, 198, 0.18);
+}
+
+.admin-add-btn {
+  background-color: #e6a8bf;
+  color: #6f2f4a;
+  border: 1px solid #dd9bb4;
+}
+
+.admin-add-btn:hover {
+  background-color: #dc99b1;
+  color: #5f233d;
+  transform: translateY(-1px);
+}
+
+.admin-cancel-btn {
+  background-color: #fff6f8;
+  color: #c85f86;
+  border: 1px solid #f3ccd8;
+}
+
+.admin-cancel-btn:hover {
+  background-color: #ffe9f0;
+  color: #b84f77;
+  transform: translateY(-1px);
+}
+
+.admin-add-btn:focus,
+.admin-cancel-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(232, 168, 192, 0.35);
 }
 
 /* ====== PRODUCT DETAIL ====== */

@@ -7,11 +7,18 @@ const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
-  const wished = isInWishlist(product.id);
+  const productId = product.id ?? product.product_id;
+  const productName = product.nombre ?? product.name ?? "Producto";
+  const productDescription = product.descripcion ?? product.description ?? "";
+  const productImage =
+    product.imagen_url ?? product.image_url ?? product.image ?? "";
+  const productPrice = Number(product.precio ?? product.price ?? 0);
+
+  const wished = isInWishlist(productId);
 
   const handleWishlist = () => {
     if (wished) {
-      removeFromWishlist(product.id);
+      removeFromWishlist(productId);
     } else {
       addToWishlist(product);
     }
@@ -19,29 +26,29 @@ const ProductCard = ({ product }) => {
 
   return (
     <div className="card h-100 shadow-sm border-0 product-card mx-auto">
-      <Link to={`/product/${product.id}`}>
+      <Link to={`/product/${productId}`}>
         <img
-          src={product.imagen_url}
+          src={productImage}
           className="card-img-top product-card-image"
-          alt={product.nombre}
+          alt={productName}
           style={{ cursor: "pointer" }}
         />
       </Link>
 
       <div className="card-body d-flex flex-column">
         <Link
-          to={`/product/${product.id}`}
+          to={`/product/${productId}`}
           className="text-decoration-none text-dark"
         >
-          <h5 className="card-title product-card-title">{product.nombre}</h5>
+          <h5 className="card-title product-card-title">{productName}</h5>
         </Link>
 
         <p className="card-text product-card-description">
-          {product.descripcion}
+          {productDescription}
         </p>
 
         <p className="product-card-price mb-3">
-          {product.price.toLocaleString("es-CL", {
+          {productPrice.toLocaleString("es-CL", {
             style: "currency",
             currency: "CLP",
           })}
@@ -50,7 +57,7 @@ const ProductCard = ({ product }) => {
         <div className="d-grid gap-2 mt-auto">
           <button
             className="btn product-cart-btn"
-            onClick={() => addToCart(product.id || product.product_id, 1)}
+            onClick={() => addToCart(productId, 1)}
           >
             Agregar al carrito
           </button>
