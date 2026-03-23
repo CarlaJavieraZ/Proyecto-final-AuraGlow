@@ -95,6 +95,7 @@ export const login = async (req, res) => {
       token,
       user: {
         id: user.id,
+        rol: user.rol,
         nombre: user.nombre,
         apellido: user.apellido,
         email: user.email,

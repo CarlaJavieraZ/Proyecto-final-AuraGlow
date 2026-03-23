@@ -1,92 +1,124 @@
-import React from "react";
-import { useParams, Link } from "react-router-dom";
-import productsData from "../../assets/mockdata/products.json";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { useWishlist } from "../../context/WishlistContext";
 
+const API_URL =
+  process.env.REACT_APP_API_URL?.replace(/\/api$/, "") || "http://localhost:5000";
+
 const ProductDetail = () => {
   const { id } = useParams();
+  const productId = id;
+
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [quantity, setQuantity] = useState(1);
+
   const { addToCart } = useCart();
-  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { toggleWishlist, isInWishlist } = useWishlist();
 
-  const product = productsData.find((item) => item._id === id);
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        setError("");
 
-  if (!product) {
+        const res = await fetch(`${API_URL}/api/products/${id}`);
+        const data = await res.json();
+
+        if (!res.ok) {
+          setError(data.error || "Producto no encontrado");
+          setProduct(null);
+          return;
+        }
+
+        setProduct(data);
+      } catch (err) {
+        console.error("Error al cargar producto:", err);
+        setError("Error al cargar el producto");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
+
+  const wishlisted = isInWishlist(productId);
+
+  const handleAddToCart = async () => {
+    await addToCart(productId, quantity);
+  };
+
+  const handleToggleWishlist = async () => {
+    await toggleWishlist(productId);
+  };
+
+  if (loading) {
+    return <p className="text-center py-5">Cargando producto...</p>;
+  }
+
+  if (error || !product) {
     return (
-      <div className="container py-5 product-detail-page">
-        <div className="product-detail-box text-center">
-          <h2 className="product-detail-title">Producto no encontrado</h2>
-          <Link to="/" className="btn product-detail-back-btn mt-3">
-            Volver al inicio
-          </Link>
-        </div>
-      </div>
+      <p className="text-center py-5">
+        {error || "Producto no encontrado"}
+      </p>
     );
   }
 
-  const wished = isInWishlist(product._id);
-
-  const handleWishlist = () => {
-    if (wished) {
-      removeFromWishlist(product._id);
-    } else {
-      addToWishlist(product);
-    }
-  };
-
   return (
-    <div className="container py-5 product-detail-page">
-      <div className="product-detail-box">
-        <div className="row align-items-center g-4">
-          <div className="col-md-6 text-center">
-            <img
-              src={product.image}
-              alt={product.name}
-              className="img-fluid product-detail-image"
+    <div className="container py-5">
+      <div className="row align-items-start g-4">
+        <div className="col-md-6">
+          <img
+            src={product.imagen_url}
+            alt={product.nombre}
+            className="img-fluid rounded shadow-sm w-100"
+          />
+        </div>
+
+        <div className="col-md-6">
+          <p className="text-muted mb-2">{product.categoria}</p>
+          <h2 className="mb-3">{product.nombre}</h2>
+          <h4 className="mb-3">
+            ${Number(product.precio || 0).toLocaleString("es-CL")}
+          </h4>
+          <p className="mb-4">{product.descripcion}</p>
+          <p className="mb-3">
+            <strong>Stock:</strong> {product.stock}
+          </p>
+
+          <div className="d-flex align-items-center gap-3 mb-4">
+            <label className="mb-0">
+              <strong>Cantidad:</strong>
+            </label>
+            <input
+              type="number"
+              min="1"
+              max={product.stock || 1}
+              value={quantity}
+              onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
+              className="form-control"
+              style={{ width: "100px" }}
             />
           </div>
 
-          <div className="col-md-6">
-            <p className="product-detail-category mb-2">
-              {product.category || "Skincare"}
-            </p>
+          <div className="d-flex gap-2 flex-wrap">
+            <button
+              className="btn auth-btn"
+              onClick={handleAddToCart}
+              disabled={product.stock === 0}
+            >
+              {product.stock > 0 ? "Agregar al carrito" : "Sin stock"}
+            </button>
 
-            <h2 className="product-detail-title mb-3">{product.name}</h2>
-
-            <p className="product-detail-description">{product.description}</p>
-
-            <p className="product-detail-price mt-4 mb-4">
-              {product.price.toLocaleString("es-CL", {
-                style: "currency",
-                currency: "CLP",
-              })}
-            </p>
-
-            <div className="d-grid gap-2 d-md-block">
-              <button
-                className="btn product-detail-cart-btn me-md-2 mb-2"
-                onClick={() => addToCart(product)}
-              >
-                Agregar al carrito
-              </button>
-
-              <button
-                className={
-                  wished
-                    ? "btn product-detail-wishlist-btn-active mb-2"
-                    : "btn product-detail-wishlist-btn mb-2"
-                }
-                onClick={handleWishlist}
-              >
-                {wished ? "♥ Quitar de deseados" : "♡ Agregar a deseados"}
-              </button>
-            </div>
-
-            <div className="mt-4">
-              <Link to="/" className="btn product-detail-back-btn">
-                ← Volver al catálogo
-              </Link>
-            </div>
+            <button
+              className="btn btn-outline-danger"
+              onClick={handleToggleWishlist}
+            >
+              {wishlisted ? "Quitar de deseados" : "Agregar a deseados"}
+            </button>
           </div>
         </div>
       </div>

@@ -2,73 +2,123 @@ import React, { createContext, useState, useContext } from "react";
 
 const AuthContext = createContext();
 
-const defaultAdmin = {
-  nombre: "Admin Aura",
-  email: "admin@auraglow.com",
-  password: "123456",
-  role: "admin",
-};
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const AuthProvider = ({ children }) => {
-  const [registeredUsers, setRegisteredUsers] = useState(() => {
-    const savedList = localStorage.getItem("aura_db_users");
-    let users = savedList ? JSON.parse(savedList) : [];
-
-    const adminExists = users.some((u) => u.email === defaultAdmin.email);
-
-    if (!adminExists) {
-      users = [...users, defaultAdmin];
-      localStorage.setItem("aura_db_users", JSON.stringify(users));
-    }
-
-    return users;
-  });
+  const [token, setToken] = useState(() => localStorage.getItem("token") || null);
 
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("aura_active_user");
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
-  const register = (newUser) => {
-    const exists = registeredUsers.some((u) => u.email === newUser.email);
+  const register = async ({ nombre, apellido, email, password }) => {
+    try {
+      const res = await fetch(`${API_URL}/api/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ nombre, apellido, email, password }),
+      });
 
-    if (exists) {
-      return { success: false, message: "El usuario ya existe" };
+      const data = await res.json();
+
+      if (!res.ok) {
+        return {
+          success: false,
+          message: data.error || data.message || "Error al registrarse",
+        };
+      }
+
+      return {
+        success: true,
+        message: data.message || "Usuario registrado correctamente",
+      };
+    } catch (error) {
+      console.error("Error en register:", error);
+      return {
+        success: false,
+        message: "No se pudo conectar con el servidor",
+      };
     }
-
-    const userWithRole = {
-      ...newUser,
-      role: "user",
-    };
-
-    const updatedList = [...registeredUsers, userWithRole];
-    setRegisteredUsers(updatedList);
-    localStorage.setItem("aura_db_users", JSON.stringify(updatedList));
-
-    return { success: true, message: "Registro exitoso" };
   };
 
-  const login = (email, password) => {
-    const foundUser = registeredUsers.find(
-      (u) => u.email === email && u.password === password
-    );
+  const login = async (email, password) => {
+    try {
+      const res = await fetch(`${API_URL}/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (foundUser) {
-      setUser(foundUser);
-      localStorage.setItem("aura_active_user", JSON.stringify(foundUser));
-      return true;
+      const data = await res.json();
+
+      if (!res.ok) {
+        return {
+          success: false,
+          message: data.error || data.message || "Error al iniciar sesión",
+        };
+      }
+
+      const receivedToken = data.token || data.accessToken || null;
+      const receivedUserRaw = data.user || data.usuario || null;
+
+      const normalizedUser = receivedUserRaw
+        ? {
+            ...receivedUserRaw,
+            role: receivedUserRaw.role ?? receivedUserRaw.rol ?? "user",
+          }
+        : null;
+
+      if (!receivedToken) {
+        return {
+          success: false,
+          message: "El backend no devolvió token",
+        };
+      }
+
+      setToken(receivedToken);
+      localStorage.setItem("token", receivedToken);
+
+      if (normalizedUser) {
+        setUser(normalizedUser);
+        localStorage.setItem("aura_active_user", JSON.stringify(normalizedUser));
+      }
+
+      return {
+        success: true,
+        user: normalizedUser,
+      };
+    } catch (error) {
+      console.error("Error en login:", error);
+      return {
+        success: false,
+        message: "No se pudo conectar con el servidor",
+      };
     }
-
-    return false;
   };
 
   const logout = () => {
+    setToken(null);
     setUser(null);
+    localStorage.removeItem("token");
     localStorage.removeItem("aura_active_user");
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, register, registeredUsers }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        login,
+        register,
+        logout,
+        isAuthenticated: !!token,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -76,9 +126,11 @@ const AuthProvider = ({ children }) => {
 
 const useAuth = () => {
   const context = useContext(AuthContext);
+
   if (!context) {
     throw new Error("useAuth debe ser usado dentro de un AuthProvider");
   }
+
   return context;
 };
 

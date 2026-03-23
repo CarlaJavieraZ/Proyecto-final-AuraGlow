@@ -21,5 +21,5 @@ https://json-generator.com/
 ```
 ## ADMIN ACCESS
 
-correo: admin@auraglow.com
-contraseña: 123456
+ "email": "carla@test.com",
+  "password": "123456"

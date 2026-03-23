@@ -1,152 +1,133 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
-import { FaTrash } from "react-icons/fa";
+
+const formatPrice = (value) => {
+  return Number(value || 0).toLocaleString("es-CL");
+};
 
 const Cart = () => {
-    const { cart, addToCart, removeFromCart, deleteFromCart, clearCart } = useCart();
+  const { cartItems, total, loading, updateQuantity, removeFromCart } = useCart();
 
-    const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
-    if (cart.length === 0) {
-        return (
-            <div className="cart-page">
-                <div className="container py-5">
-                    <div className="cart-box text-center">
-                        <h2 className="cart-title mb-3">Tu carrito está vacío</h2>
-                        <p className="cart-subtitle mb-4">
-                            Agrega tus productos favoritos y arma tu rutina Aura Glow ✨
-                        </p>
-                        <div className="empty-state-box mt-3">
-                            <div className="empty-state-icon">🛒</div>
-                            <h4 className="empty-state-title">Aún no tienes productos</h4>
-                            <p className="empty-state-text">
-                                Explora Aura Glow y agrega tus favoritos al carrito.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
+  if (loading) {
     return (
-        <div className="cart-page">
-            <div className="container py-5">
-                <div className="cart-box">
-                    <div className="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
-                        <div>
-                            <h2 className="cart-title mb-1">Mi carrito</h2>
-                            <p className="cart-subtitle mb-0">
-                                Revisa tus productos antes de continuar
-                            </p>
-                        </div>
+      <div className="container py-5">
+        <h2 className="mb-4">Mi carrito</h2>
+        <p>Cargando carrito...</p>
+      </div>
+    );
+  }
+
+  if (!cartItems.length) {
+    return (
+      <div className="container py-5">
+        <h2 className="mb-4">Mi carrito</h2>
+        <div className="alert alert-light border rounded-4 shadow-sm">
+          Tu carrito está vacío.
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container py-5">
+      <h2 className="mb-4">Mi carrito</h2>
+
+      <div className="row g-4">
+        <div className="col-lg-8">
+          {cartItems.map((item) => (
+            <div
+              key={item.product_id}
+              className="card mb-3 border-0 shadow-sm rounded-4"
+            >
+              <div className="row g-0 align-items-center">
+                <div className="col-md-3 p-3 text-center">
+                  <img
+                    src={item.imagen_url || "https://via.placeholder.com/300x300?text=Producto"}
+                    alt={item.nombre}
+                    className="img-fluid rounded-3"
+                    style={{ maxHeight: "120px", objectFit: "cover" }}
+                  />
+                </div>
+
+                <div className="col-md-9">
+                  <div className="card-body">
+                    <div className="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                      <div>
+                        <h5 className="mb-1">{item.nombre}</h5>
+                        <p className="text-muted mb-2">
+                          Precio unitario: ${formatPrice(item.precio)}
+                        </p>
+                      </div>
+
+                      <button
+                        className="btn btn-outline-danger btn-sm"
+                        onClick={() => removeFromCart(item.product_id)}
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+
+                    <div className="d-flex align-items-center justify-content-between flex-wrap gap-3 mt-3">
+                      <div className="d-flex align-items-center border rounded-pill px-2 py-1">
+                        <button
+                          className="btn btn-sm"
+                          onClick={() =>
+                            updateQuantity(item.product_id, item.quantity - 1)
+                          }
+                        >
+                          -
+                        </button>
+
+                        <span className="mx-3 fw-semibold">{item.quantity}</span>
 
                         <button
-                            className="btn cart-clear-btn"
-                            onClick={() => {
-                                if (window.confirm("¿Seguro que quieres vaciar el carrito?")) {
-                                    clearCart();
-                                }
-                            }}
+                          className="btn btn-sm"
+                          onClick={() =>
+                            updateQuantity(item.product_id, item.quantity + 1)
+                          }
                         >
-                            Vaciar carrito
+                          +
                         </button>
+                      </div>
+
+                      <div className="fw-bold">
+                        Subtotal: ${formatPrice(item.subtotal)}
+                      </div>
                     </div>
-
-                    <div className="row g-4">
-                        <div className="col-lg-8">
-                            {cart.map((item) => (
-                                <div key={item._id} className="cart-item-card mb-3">
-                                    <div className="row align-items-center g-3">
-                                        <div className="col-md-3 text-center">
-                                            <img
-                                                src={item.image}
-                                                alt={item.name}
-                                                className="cart-item-image"
-                                            />
-                                        </div>
-
-                                        <div className="col-md-5">
-                                            <h5 className="cart-item-name">{item.name}</h5>
-                                            <p className="cart-item-price mb-1">
-                                                ${item.price.toLocaleString("es-CL")}
-                                            </p>
-                                            <small className="cart-item-text">
-                                                Producto de skincare Aura Glow
-                                            </small>
-                                        </div>
-
-                                        <div className="col-md-4">
-                                            <div className="d-flex flex-column align-items-md-end align-items-start gap-2">
-                                                <div className="cart-quantity-box">
-                                                    <button
-                                                        className="cart-qty-btn"
-                                                        onClick={() => removeFromCart(item._id)}
-                                                    >
-                                                        −
-                                                    </button>
-
-                                                    <span className="cart-quantity-number">
-                                                        {item.quantity}
-                                                    </span>
-
-                                                    <button
-                                                        className="cart-qty-btn"
-                                                        onClick={() => addToCart(item)}
-                                                    >
-                                                        +
-                                                    </button>
-                                                </div>
-
-                                                <p className="cart-item-subtotal mb-0">
-                                                    Subtotal: $
-                                                    {(item.price * item.quantity).toLocaleString("es-CL")}
-                                                </p>
-
-                                                <button
-                                                    className="cart-remove-item-btn"
-                                                    onClick={() => deleteFromCart(item._id)}
-                                                >
-                                                    <FaTrash /> Eliminar
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className="col-lg-4">
-                            <div className="cart-summary-card">
-                                <h4 className="cart-summary-title mb-4">Resumen de compra</h4>
-
-                                <div className="d-flex justify-content-between mb-2">
-                                    <span>Productos</span>
-                                    <span>
-                                        {cart.reduce((acc, item) => acc + item.quantity, 0)}
-                                    </span>
-                                </div>
-
-                                <div className="d-flex justify-content-between mb-3">
-                                    <span>Total</span>
-                                    <strong>${total.toLocaleString("es-CL")}</strong>
-                                </div>
-
-                                <button className="btn cart-checkout-btn w-100 mb-2">
-                                    Continuar compra
-                                </button>
-
-                                <p className="cart-summary-note mb-0">
-                                    En Aura Glow cuidamos tu piel con una experiencia suave,
-                                    delicada y pensada para ti.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                  </div>
                 </div>
+              </div>
             </div>
+          ))}
         </div>
-    );
+
+        <div className="col-lg-4">
+          <div className="card border-0 shadow-sm rounded-4">
+            <div className="card-body p-4">
+              <h4 className="mb-4">Resumen</h4>
+
+              <div className="d-flex justify-content-between mb-2">
+                <span>Productos</span>
+                <span>
+                  {cartItems.reduce((acc, item) => acc + Number(item.quantity || 0), 0)}
+                </span>
+              </div>
+
+              <div className="d-flex justify-content-between fw-bold fs-5 border-top pt-3">
+                <span>Total</span>
+                <span>${formatPrice(total)}</span>
+              </div>
+
+              <Link to="/checkout" className="btn btn-dark w-100 mt-4 rounded-pill">
+                Ir a pagar
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Cart;

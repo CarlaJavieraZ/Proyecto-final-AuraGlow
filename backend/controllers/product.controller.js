@@ -2,11 +2,19 @@ import pool from "../config/db.js";
 
 export const getAllProducts = async (req, res) => {
   try {
-    const result = await pool.query(
-      `SELECT id, nombre, descripcion, precio, stock, categoria, imagen_url, created_at
-       FROM products
-       ORDER BY id ASC`
-    );
+    const result = await pool.query(`
+  SELECT 
+    id,
+    nombre,
+    descripcion,
+    precio::float AS precio,
+    stock,
+    categoria,
+    imagen_url,
+    created_at
+  FROM products
+  ORDER BY id ASC
+`);
 
     return res.status(200).json(result.rows);
   } catch (error) {

@@ -20,7 +20,7 @@ const Profile = () => {
       setProfileImage(savedImage);
     }
 
-    const savedPurchases = localStorage.getItem(`aura_purchases_${user.email}`);
+    const savedPurchases = localStorage.getItem("aura_orders");
     if (savedPurchases) {
       setPurchases(JSON.parse(savedPurchases));
     } else {
@@ -213,42 +213,61 @@ const Profile = () => {
             </div>
           ) : (
             <div className="row g-4">
-              {purchases.map((item) => (
-                <div className="col-md-6 col-lg-4" key={item._id}>
+              {purchases.map((order) => (
+                <div className="col-md-6 col-lg-4" key={order.id}>
                   <div className="profile-purchase-card h-100">
-                    {item.image ? (
-                      <img
-                        src={item.image}
-                        className="profile-purchase-image"
-                        alt={item.name}
-                        onError={handleImageError}
-                      />
-                    ) : (
-                      <div className="profile-purchase-image profile-image-fallback">
-                        Aura Glow
-                      </div>
-                    )}
+                    <div className="profile-purchase-image profile-image-fallback">
+                      Aura Glow
+                    </div>
 
-                    <h5 className="profile-product-name mt-3">{item.name}</h5>
+                    <h5 className="profile-product-name mt-3">
+                      Pedido {order.id}
+                    </h5>
 
                     <p className="profile-product-price">
-                      {Number(item.price).toLocaleString("es-CL", {
+                      {Number(order.total || 0).toLocaleString("es-CL", {
                         style: "currency",
                         currency: "CLP",
                       })}
                     </p>
 
                     <p className="profile-purchase-date">
-                      Compra realizada: {item.date}
+                      Compra realizada: {order.fecha}
                     </p>
 
-                    <button className="btn profile-secondary-btn">
+                    <p className="mb-2">
+                      <strong>Estado:</strong> {order.estado}
+                    </p>
+
+                    <p className="mb-3">
+                      <strong>Productos:</strong> {order.items?.length || 0}
+                    </p>
+
+                    <button
+                      className="btn profile-secondary-btn"
+                      onClick={() =>
+                        alert(
+                          (order.items || [])
+                            .map(
+                              (item) =>
+                                `${item.nombre} x${item.quantity} - ${Number(
+                                  item.subtotal ?? item.precio * item.quantity ?? 0
+                                ).toLocaleString("es-CL", {
+                                  style: "currency",
+                                  currency: "CLP",
+                                })}`
+                            )
+                            .join("\n")
+                        )
+                      }
+                    >
                       Ver detalle
                     </button>
                   </div>
                 </div>
               ))}
             </div>
+
           )}
         </div>
       </div>

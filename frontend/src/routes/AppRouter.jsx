@@ -12,6 +12,8 @@ import Cart from "../components/ui/Cart";
 import Wishlist from "../components/ui/Wishlist";
 import AdminPanel from "../components/AdminPanel";
 import ProductDetail from "../components/products/ProductDetail";
+import Checkout from "../pages/Checkout/Checkout";
+import OrderSuccess from "../pages/Checkout/OrderSuccess";
 
 const AppRouter = () => {
   return (
@@ -43,6 +45,8 @@ const AppRouter = () => {
         <Route path="/cart" element={<Cart />} />
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/product/:id" element={<ProductDetail />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/compra-exitosa" element={<OrderSuccess />} />
       </Routes>
       <Footer />
     </Router>

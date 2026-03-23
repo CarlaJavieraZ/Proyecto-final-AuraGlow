@@ -7,8 +7,8 @@ import { useWishlist } from "../../context/WishlistContext";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
-  const { cart } = useCart();
-  const { wishlist } = useWishlist();
+  const { itemCount = 0 } = useCart();
+  const { wishlist = [] } = useWishlist();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -16,7 +16,6 @@ const Navbar = () => {
     navigate("/login");
   };
 
-  const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
   const totalWishlistItems = wishlist.length;
 
   return (
@@ -88,9 +87,9 @@ const Navbar = () => {
 
           <Link to="/cart" className="nav-link position-relative ms-2">
             <FaShoppingCart size={22} />
-            {totalItems > 0 && (
+            {itemCount > 0 && (
               <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                {totalItems}
+                {itemCount}
               </span>
             )}
           </Link>

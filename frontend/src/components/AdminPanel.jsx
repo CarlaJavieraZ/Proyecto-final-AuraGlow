@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import productsData from "../assets/mockdata/products.json";
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 
 const AdminPanel = () => {
     const { user } = useAuth();
@@ -10,28 +12,28 @@ const AdminPanel = () => {
     const [editingId, setEditingId] = useState(null);
 
     const [formData, setFormData] = useState({
-        name: "",
-        price: "",
-        description: "",
-        image: "",
-        category: "",
+        nombre: "",
+        precio: 0,
+        descripcion: "",
+        imagen_url: "",
+        categoria: "",
+        stock: "",
     });
 
     useEffect(() => {
-        const savedProducts = localStorage.getItem("aura_products");
+        const fetchProducts = async () => {
+            try {
+                const res = await fetch(`${API_URL}/api/products`);
+                const data = await res.json();
+                setProducts(data);
+            } catch (error) {
+                console.error("Error al cargar productos:", error);
+            }
+        };
 
-        if (savedProducts) {
-            setProducts(JSON.parse(savedProducts));
-        } else {
-            setProducts(productsData);
-            localStorage.setItem("aura_products", JSON.stringify(productsData));
-        }
+        fetchProducts();
     }, []);
 
-    const saveProducts = (updatedProducts) => {
-        setProducts(updatedProducts);
-        localStorage.setItem("aura_products", JSON.stringify(updatedProducts));
-    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -43,82 +45,119 @@ const AdminPanel = () => {
 
     const resetForm = () => {
         setFormData({
-            name: "",
-            price: "",
-            description: "",
-            image: "",
-            category: "",
+            nombre: "",
+            precio: 0,
+            descripcion: "",
+            imagen_url: "",
+            categoria: "",
+            stock: "",
         });
         setIsEditing(false);
         setEditingId(null);
     };
 
-    const handleAddOrUpdate = (e) => {
+    const handleAddOrUpdate = async (e) => {
         e.preventDefault();
 
         if (
-            !formData.name ||
-            !formData.price ||
-            !formData.description ||
-            !formData.image ||
-            !formData.category
+            !formData.nombre ||
+            !formData.precio ||
+            !formData.descripcion ||
+            !formData.imagen_url ||
+            !formData.categoria ||
+            formData.stock === ""
         ) {
             alert("Completa todos los campos.");
             return;
         }
 
-        if (isEditing) {
-            const updatedProducts = products.map((product) =>
-                product._id === editingId
-                    ? {
-                        ...product,
-                        ...formData,
-                        price: Number(formData.price),
-                    }
-                    : product
-            );
+        try {
+            const token = localStorage.getItem("token");
 
-            saveProducts(updatedProducts);
+            const payload = {
+                nombre: formData.nombre,
+                precio: Number(formData.precio),
+                descripcion: formData.descripcion,
+                imagen_url: formData.imagen_url,
+                categoria: formData.categoria,
+                stock: Number(formData.stock),
+            };
+
+            const url = isEditing
+                ? `${API_URL}/api/products/${editingId}`
+                : `${API_URL}/api/products`;
+
+            const method = isEditing ? "PUT" : "POST";
+
+            const res = await fetch(url, {
+                method,
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                alert(data.error || "Ocurrió un error");
+                return;
+            }
+
+            const productsRes = await fetch(`${API_URL}/api/products`);
+            const productsData = await productsRes.json();
+            setProducts(productsData);
+
             resetForm();
-            return;
+        } catch (error) {
+            console.error("Error al guardar producto:", error);
+            alert("Error al guardar producto");
         }
-
-        const newProduct = {
-            _id: Date.now().toString(),
-            name: formData.name,
-            price: Number(formData.price),
-            description: formData.description,
-            image: formData.image,
-            category: formData.category,
-            url: "/",
-        };
-
-        const updatedProducts = [...products, newProduct];
-        saveProducts(updatedProducts);
-        resetForm();
     };
 
     const handleEdit = (product) => {
         setFormData({
-            name: product.name || "",
-            price: product.price || "",
-            description: product.description || "",
-            image: product.image || "",
-            category: product.category || "",
+            nombre: product.nombre || "",
+            precio: product.precio || 0,
+            descripcion: product.descripcion || "",
+            imagen_url: product.imagen_url || "",
+            categoria: product.categoria || "",
+            stock: product.stock || "",
         });
         setIsEditing(true);
-        setEditingId(product._id);
+        setEditingId(product.id);
     };
 
-    const handleDelete = (_id) => {
+    const handleDelete = async (id) => {
         const confirmDelete = window.confirm(
             "¿Seguro que quieres eliminar este producto?"
         );
 
         if (!confirmDelete) return;
 
-        const updatedProducts = products.filter((product) => product._id !== _id);
-        saveProducts(updatedProducts);
+        try {
+            const token = localStorage.getItem("token");
+
+            const res = await fetch(`${API_URL}/api/products/${id}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                alert(data.error || "No se pudo eliminar");
+                return;
+            }
+
+            setProducts((prev) => prev.filter((product) => product.id !== id));
+        } catch (error) {
+            console.error("Error al eliminar:", error);
+            alert("Error al eliminar producto");
+        }
     };
 
     return (
@@ -145,9 +184,9 @@ const AdminPanel = () => {
                                 <label className="auth-label">Nombre</label>
                                 <input
                                     type="text"
-                                    name="name"
+                                    name="nombre"
                                     className="form-control auth-input"
-                                    value={formData.name}
+                                    value={formData.nombre}
                                     onChange={handleChange}
                                     placeholder="Nombre del producto"
                                 />
@@ -157,11 +196,23 @@ const AdminPanel = () => {
                                 <label className="auth-label">Precio</label>
                                 <input
                                     type="number"
-                                    name="price"
+                                    name="precio"
                                     className="form-control auth-input"
-                                    value={formData.price}
+                                    value={formData.precio}
                                     onChange={handleChange}
                                     placeholder="Precio"
+                                />
+                            </div>
+
+                            <div className="col-md-6">
+                                <label className="auth-label">Stock</label>
+                                <input
+                                    type="number"
+                                    name="stock"
+                                    className="form-control auth-input"
+                                    value={formData.stock}
+                                    onChange={handleChange}
+                                    placeholder="Stock disponible"
                                 />
                             </div>
 
@@ -169,9 +220,9 @@ const AdminPanel = () => {
                                 <label className="auth-label">Imagen</label>
                                 <input
                                     type="text"
-                                    name="image"
+                                    name="imagen_url"
                                     className="form-control auth-input"
-                                    value={formData.image}
+                                    value={formData.imagen_url}
                                     onChange={handleChange}
                                     placeholder="/images/products/nuevo.png"
                                 />
@@ -181,9 +232,9 @@ const AdminPanel = () => {
                                 <label className="auth-label">Categoría</label>
                                 <input
                                     type="text"
-                                    name="category"
+                                    name="categoria"
                                     className="form-control auth-input"
-                                    value={formData.category}
+                                    value={formData.categoria}
                                     onChange={handleChange}
                                     placeholder="Cremas, Serums, Tonicos..."
                                 />
@@ -192,10 +243,10 @@ const AdminPanel = () => {
                             <div className="col-12">
                                 <label className="auth-label">Descripción</label>
                                 <textarea
-                                    name="description"
+                                    name="descripcion"
                                     className="form-control auth-input"
                                     rows="3"
-                                    value={formData.description}
+                                    value={formData.descripcion}
                                     onChange={handleChange}
                                     placeholder="Descripción del producto"
                                 />
@@ -203,14 +254,14 @@ const AdminPanel = () => {
                         </div>
 
                         <div className="d-flex gap-2 flex-wrap mt-4">
-                            <button type="submit" className="btn admin-add-btn">
+                            <button type="submit" className="admin-add-btn">
                                 {isEditing ? "Guardar cambios" : "+ Agregar producto"}
                             </button>
 
                             {isEditing && (
                                 <button
                                     type="button"
-                                    className="btn admin-edit-btn"
+                                    className="admin-edit-btn"
                                     onClick={resetForm}
                                 >
                                     Cancelar
@@ -242,34 +293,37 @@ const AdminPanel = () => {
                             </thead>
                             <tbody>
                                 {products.map((product) => (
-                                    <tr key={product._id}>
+                                    <tr key={product.id}>
                                         <td>
                                             <img
-                                                src={product.image}
-                                                alt={product.name}
+                                                src={product.imagen_url}
+                                                alt={product.nombre}
                                                 className="admin-product-image"
                                             />
                                         </td>
-                                        <td>{product.name}</td>
+                                        <td>{product.nombre}</td>
                                         <td>
-                                            {Number(product.price).toLocaleString("es-CL", {
+                                            {Number(product.precio).toLocaleString("es-CL", {
                                                 style: "currency",
                                                 currency: "CLP",
                                             })}
                                         </td>
-                                        <td>{product.description}</td>
-                                        <td>{product.category}</td>
+                                        <td>{product.descripcion}</td>
+                                        <td>{product.categoria}</td>
                                         <td>
-                                            <div className="d-flex gap-2 flex-wrap">
+                                            <div className="admin-actions">
                                                 <button
-                                                    className="btn admin-edit-btn"
+                                                    type="button"
+                                                    className="admin-edit-btn"
                                                     onClick={() => handleEdit(product)}
                                                 >
                                                     Editar
                                                 </button>
+
                                                 <button
-                                                    className="btn admin-delete-btn"
-                                                    onClick={() => handleDelete(product._id)}
+                                                    type="button"
+                                                    className="admin-delete-btn"
+                                                    onClick={() => handleDelete(product.id)}
                                                 >
                                                     Eliminar
                                                 </button>
@@ -280,11 +334,6 @@ const AdminPanel = () => {
                             </tbody>
                         </table>
                     </div>
-
-                    <p className="admin-note mt-3 mb-0">
-                        Los cambios se guardan en localStorage para simular una gestión real
-                        de productos en frontend.
-                    </p>
                 </div>
             </div>
         </div>
