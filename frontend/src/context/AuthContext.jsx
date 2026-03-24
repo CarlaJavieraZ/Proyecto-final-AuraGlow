@@ -2,7 +2,7 @@ import React, { createContext, useState, useContext } from "react";
 
 const AuthContext = createContext();
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+const API_URL = process.env.REACT_APP_API_URL || "https://proyecto-final-auraglow.onrender.com";
 
 const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem("token") || null);
