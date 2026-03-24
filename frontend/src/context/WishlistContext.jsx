@@ -6,10 +6,11 @@ import React, {
   useMemo,
   useState,
 } from "react";
+import { useAuth } from "./AuthContext";
 
 const WishlistContext = createContext();
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const normalizeWishlistResponse = (data) => {
   const rawItems = Array.isArray(data)
@@ -42,15 +43,19 @@ export const WishlistProvider = ({ children }) => {
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const token = localStorage.getItem("token");
+  const { token, isAuthenticated } = useAuth();
 
   const authFetch = useCallback(
     async (endpoint, options = {}) => {
-      const response = await fetch(`${API_URL}${endpoint}`, {
+      if (!token) {
+        throw new Error("Debes iniciar sesión para usar favoritos");
+      }
+
+      const response = await fetch(`${API_URL}/api${endpoint}`, {
         ...options,
         headers: {
           "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
           ...(options.headers || {}),
         },
       });
@@ -80,7 +85,7 @@ export const WishlistProvider = ({ children }) => {
   );
 
   const fetchWishlist = useCallback(async () => {
-    if (!token) {
+    if (!isAuthenticated || !token) {
       setWishlist([]);
       return;
     }
@@ -95,7 +100,7 @@ export const WishlistProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [authFetch, token]);
+  }, [authFetch, isAuthenticated, token]);
 
   useEffect(() => {
     fetchWishlist();
@@ -107,11 +112,6 @@ export const WishlistProvider = ({ children }) => {
     if (!resolvedId) {
       throw new Error("No se encontró el id del producto para favoritos");
     }
-
-    console.log("Enviando a favoritos:", {
-      original: productValue,
-      resolvedId,
-    });
 
     await authFetch("/favorites", {
       method: "POST",
