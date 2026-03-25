@@ -4,7 +4,7 @@ import { useCart } from "../../context/CartContext";
 import { useWishlist } from "../../context/WishlistContext";
 
 const API_URL =
-  process.env.REACT_APP_API_URL?.replace(/\/api$/, "") || "http://localhost:5000";
+  process.env.REACT_APP_API_URL?.replace(/\/api$/, "") || "https://proyecto-final-auraglow.onrender.com";
 
 const ProductDetail = () => {
   const { id } = useParams();

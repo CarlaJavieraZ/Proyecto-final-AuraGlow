@@ -6,11 +6,10 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { useAuth } from "./AuthContext";
 
 const WishlistContext = createContext();
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+const API_URL = process.env.REACT_APP_API_URL || "https://proyecto-final-auraglow.onrender.com";
 
 const normalizeWishlistResponse = (data) => {
   const rawItems = Array.isArray(data)
@@ -43,14 +42,10 @@ export const WishlistProvider = ({ children }) => {
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const { token, isAuthenticated } = useAuth();
+  const token = localStorage.getItem("token");
 
   const authFetch = useCallback(
     async (endpoint, options = {}) => {
-      if (!token) {
-        throw new Error("Debes iniciar sesión para usar favoritos");
-      }
-
       const response = await fetch(`${API_URL}/api${endpoint}`, {
         ...options,
         headers: {
@@ -85,7 +80,7 @@ export const WishlistProvider = ({ children }) => {
   );
 
   const fetchWishlist = useCallback(async () => {
-    if (!isAuthenticated || !token) {
+    if (!token) {
       setWishlist([]);
       return;
     }
@@ -100,7 +95,7 @@ export const WishlistProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [authFetch, isAuthenticated, token]);
+  }, [authFetch, token]);
 
   useEffect(() => {
     fetchWishlist();
@@ -110,31 +105,51 @@ export const WishlistProvider = ({ children }) => {
     const resolvedId = resolveProductId(productValue);
 
     if (!resolvedId) {
-      throw new Error("No se encontró el id del producto para favoritos");
+      alert("No se encontró el id del producto");
+      return;
     }
 
-    await authFetch("/favorites", {
-      method: "POST",
-      body: JSON.stringify({
-        product_id: resolvedId,
-      }),
-    });
+    if (!token) {
+      alert("Debes iniciar sesión para agregar productos a favoritos");
+      return;
+    }
 
-    await fetchWishlist();
+    try {
+      await authFetch("/favorites", {
+        method: "POST",
+        body: JSON.stringify({
+          product_id: resolvedId,
+        }),
+      });
+
+      await fetchWishlist();
+    } catch (error) {
+      alert(error.message || "Error al agregar a favoritos");
+    }
   };
 
   const removeFromWishlist = async (productValue) => {
     const resolvedId = resolveProductId(productValue);
 
     if (!resolvedId) {
-      throw new Error("No se encontró el id del producto para eliminar favoritos");
+      alert("No se encontró el id del producto para eliminar favoritos");
+      return;
     }
 
-    await authFetch(`/favorites/${resolvedId}`, {
-      method: "DELETE",
-    });
+    if (!token) {
+      alert("Debes iniciar sesión para modificar favoritos");
+      return;
+    }
 
-    await fetchWishlist();
+    try {
+      await authFetch(`/favorites/${resolvedId}`, {
+        method: "DELETE",
+      });
+
+      await fetchWishlist();
+    } catch (error) {
+      alert(error.message || "Error al eliminar de favoritos");
+    }
   };
 
   const isInWishlist = useCallback(
@@ -153,7 +168,13 @@ export const WishlistProvider = ({ children }) => {
     const resolvedId = resolveProductId(productValue);
 
     if (!resolvedId) {
-      throw new Error("No se encontró el id del producto para favoritos");
+      alert("No se encontró el id del producto para favoritos");
+      return;
+    }
+
+    if (!token) {
+      alert("Debes iniciar sesión para agregar productos a favoritos");
+      return;
     }
 
     if (isInWishlist(resolvedId)) {

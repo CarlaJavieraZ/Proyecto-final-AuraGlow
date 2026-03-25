@@ -10,7 +10,7 @@ import { useAuth } from "./AuthContext";
 
 const CartContext = createContext();
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+const API_URL = process.env.REACT_APP_API_URL || "https://proyecto-final-auraglow.onrender.com";
 
 const getErrorMessage = (payload, status) => {
   if (!payload) return `Error HTTP ${status}`;
