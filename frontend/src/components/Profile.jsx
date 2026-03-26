@@ -169,17 +169,11 @@ const Profile = () => {
                     </p>
 
                     <div className="d-grid gap-2">
-                      <button
-                        className="btn profile-cart-btn"
-                        onClick={() => addToCart(item)}
-                      >
+                      <button onClick={() => addToCart(item.product_id || item.id, 1)}>
                         Agregar al carrito
                       </button>
 
-                      <button
-                        className="btn profile-remove-btn"
-                        onClick={() => removeFromWishlist(item._id)}
-                      >
+                      <button onClick={() => removeFromWishlist(item.product_id || item.id)}>
                         Quitar de deseados
                       </button>
                     </div>
