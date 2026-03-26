@@ -1,13 +1,51 @@
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useAuth } from "./AuthContext";
 
 const WishlistContext = createContext();
 
-export const WishlistProvider = ({ children }) => {
-  const { token } = useAuth();
-  const API_URL = process.env.REACT_APP_API_URL || "https://proyecto-final-auraglow.onrender.com";
+const API_URL =
+  process.env.REACT_APP_API_URL ||
+  "https://proyecto-final-auraglow.onrender.com";
 
+const normalizeWishlistResponse = (data) => {
+  const rawItems = Array.isArray(data)
+    ? data
+    : data.items || data.wishlist || data.favorites || [];
+
+  return rawItems.map((item) => ({
+    id: item.product_id ?? item.id,
+    product_id: item.product_id ?? item.id,
+    nombre: item.nombre ?? item.name ?? "Producto",
+    precio: Number(item.precio ?? item.price ?? 0),
+    imagen_url: item.imagen_url ?? item.image_url ?? item.image ?? "",
+    descripcion: item.descripcion ?? item.description ?? "",
+    categoria: item.categoria ?? item.category ?? "",
+  }));
+};
+
+const resolveProductId = (value) => {
+  if (value === null || value === undefined) return null;
+
+  if (typeof value === "object") {
+    const nestedId = value.product_id ?? value.id ?? null;
+    return nestedId !== null && nestedId !== undefined ? String(nestedId) : null;
+  }
+
+  return String(value);
+};
+
+export const WishlistProvider = ({ children }) => {
   const [wishlist, setWishlist] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const { token } = useAuth();
 
   const authFetch = useCallback(
     async (endpoint, options = {}) => {
@@ -32,65 +70,136 @@ export const WishlistProvider = ({ children }) => {
       if (!response.ok) {
         throw new Error(
           payload?.message ||
-          payload?.error ||
-          `Error HTTP ${response.status}`
+            payload?.error ||
+            payload?.detail ||
+            payload ||
+            `Error HTTP ${response.status}`
         );
       }
 
       return payload;
     },
-    [token, API_URL]
+    [token]
   );
 
-  const loadWishlist = useCallback(async () => {
-    if (!token) return setWishlist([]);
+  const fetchWishlist = useCallback(async () => {
+    if (!token) {
+      setWishlist([]);
+      return;
+    }
 
+    setLoading(true);
     try {
       const data = await authFetch("");
-      setWishlist(Array.isArray(data) ? data : []);
+      setWishlist(normalizeWishlistResponse(data));
     } catch (error) {
-      console.error("Error al cargar favoritos:", error);
+      console.error("Error al obtener wishlist:", error.message);
       setWishlist([]);
+    } finally {
+      setLoading(false);
     }
-  }, [token, authFetch]);
+  }, [authFetch, token]);
 
   useEffect(() => {
-    loadWishlist();
-  }, [loadWishlist]);
+    fetchWishlist();
+  }, [fetchWishlist]);
 
-  const addToWishlist = async (productId) => {
+  const addToWishlist = async (productValue) => {
+    const resolvedId = resolveProductId(productValue);
+
+    if (!resolvedId) {
+      alert("No se encontró el id del producto");
+      return;
+    }
+
+    if (!token) {
+      alert("Debes iniciar sesión para agregar productos a favoritos");
+      return;
+    }
+
     try {
       await authFetch("", {
         method: "POST",
         body: JSON.stringify({
-          product_id: productId,
+          product_id: resolvedId,
         }),
       });
 
-      await loadWishlist();
+      await fetchWishlist();
     } catch (error) {
-      alert(error.message);
+      alert(error.message || "Error al agregar a favoritos");
     }
   };
 
-  const removeFromWishlist = async (productId) => {
+  const removeFromWishlist = async (productValue) => {
+    const resolvedId = resolveProductId(productValue);
+
+    if (!resolvedId) {
+      alert("No se encontró el id del producto para eliminar favoritos");
+      return;
+    }
+
+    if (!token) {
+      alert("Debes iniciar sesión para modificar favoritos");
+      return;
+    }
+
     try {
-      await authFetch(`/${productId}`, {
+      await authFetch(`/${resolvedId}`, {
         method: "DELETE",
       });
 
-      await loadWishlist();
+      await fetchWishlist();
     } catch (error) {
-      alert(error.message);
+      alert(error.message || "Error al eliminar de favoritos");
     }
   };
+
+  const isInWishlist = useCallback(
+    (productValue) => {
+      const resolvedId = resolveProductId(productValue);
+      if (!resolvedId) return false;
+
+      return wishlist.some(
+        (item) => String(item.product_id ?? item.id) === resolvedId
+      );
+    },
+    [wishlist]
+  );
+
+  const toggleWishlist = async (productValue) => {
+    const resolvedId = resolveProductId(productValue);
+
+    if (!resolvedId) {
+      alert("No se encontró el id del producto para favoritos");
+      return;
+    }
+
+    if (!token) {
+      alert("Debes iniciar sesión para agregar productos a favoritos");
+      return;
+    }
+
+    if (isInWishlist(resolvedId)) {
+      await removeFromWishlist(resolvedId);
+    } else {
+      await addToWishlist(resolvedId);
+    }
+  };
+
+  const wishlistCount = useMemo(() => wishlist.length, [wishlist]);
 
   return (
     <WishlistContext.Provider
       value={{
         wishlist,
+        loading,
+        wishlistCount,
+        fetchWishlist,
         addToWishlist,
         removeFromWishlist,
+        toggleWishlist,
+        isInWishlist,
       }}
     >
       {children}

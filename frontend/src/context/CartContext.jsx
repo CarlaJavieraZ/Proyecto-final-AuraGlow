@@ -1,13 +1,70 @@
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useAuth } from "./AuthContext";
 
 const CartContext = createContext();
 
-export const CartProvider = ({ children }) => {
-  const { token } = useAuth();
-  const API_URL = process.env.REACT_APP_API_URL || "https://proyecto-final-auraglow.onrender.com";
+const API_URL =
+  process.env.REACT_APP_API_URL ||
+  "https://proyecto-final-auraglow.onrender.com";
 
-  const [cart, setCart] = useState([]);
+const getErrorMessage = (payload, status) => {
+  if (!payload) return `Error HTTP ${status}`;
+  if (typeof payload === "string") return payload;
+
+  return (
+    payload.message ||
+    payload.error ||
+    payload.detail ||
+    payload.details ||
+    JSON.stringify(payload)
+  );
+};
+
+const normalizeCartResponse = (data) => {
+  const rawItems = Array.isArray(data)
+    ? data
+    : data.items || data.cartItems || data.cart || [];
+
+  const items = rawItems.map((item) => {
+    const quantity = Number(item.quantity ?? 1);
+    const precio = Number(item.precio ?? item.price ?? 0);
+    const subtotal = Number(item.subtotal ?? precio * quantity);
+
+    return {
+      id: item.id ?? item.cart_item_id ?? item.product_id,
+      product_id: item.product_id ?? item.productId ?? item.id,
+      nombre: item.nombre ?? item.name ?? "Producto",
+      precio,
+      subtotal,
+      imagen_url: item.imagen_url ?? item.image_url ?? item.image ?? "",
+      quantity,
+    };
+  });
+
+  const totalFromBackend = Number(
+    Array.isArray(data) ? 0 : data.total ?? data.cartTotal ?? 0
+  );
+
+  const total =
+    totalFromBackend ||
+    items.reduce((acc, item) => acc + Number(item.subtotal || 0), 0);
+
+  return { items, total };
+};
+
+export const CartProvider = ({ children }) => {
+  const [cartItems, setCartItems] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
+
+  const { token, isAuthenticated } = useAuth();
 
   const authFetch = useCallback(
     async (endpoint, options = {}) => {
@@ -35,72 +92,126 @@ export const CartProvider = ({ children }) => {
           payload,
         });
 
-        throw new Error(
-          payload?.message ||
-          payload?.error ||
-          `Error HTTP ${response.status}`
-        );
+        throw new Error(getErrorMessage(payload, response.status));
       }
 
       return payload;
     },
-    [token, API_URL]
+    [token]
   );
 
-  const loadCart = useCallback(async () => {
-    if (!token) return setCart([]);
+  const fetchCart = useCallback(async () => {
+    if (!isAuthenticated || !token) {
+      setCartItems([]);
+      setTotal(0);
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const data = await authFetch("");
-      setCart(Array.isArray(data) ? data : []);
+      const normalized = normalizeCartResponse(data);
+
+      setCartItems(normalized.items);
+      setTotal(normalized.total);
     } catch (error) {
-      console.error("Error al cargar carrito:", error);
-      setCart([]);
+      console.error("Error al obtener carrito:", error.message);
+      setCartItems([]);
+      setTotal(0);
+    } finally {
+      setLoading(false);
     }
-  }, [token, authFetch]);
+  }, [authFetch, token, isAuthenticated]);
 
   useEffect(() => {
-    loadCart();
-  }, [loadCart]);
+    fetchCart();
+  }, [fetchCart]);
 
   const addToCart = async (productId, quantity = 1) => {
     try {
+      if (!isAuthenticated || !token) {
+        alert("Debes iniciar sesión para agregar productos al carrito");
+        return { success: false };
+      }
+
+      if (!productId) {
+        alert("No se encontró el ID del producto");
+        return { success: false };
+      }
+
+      const numericProductId = Number(productId);
+      const numericQuantity = Number(quantity) || 1;
+
       await authFetch("", {
         method: "POST",
         body: JSON.stringify({
-          product_id: productId,
-          quantity,
+          product_id: numericProductId,
+          productId: numericProductId,
+          quantity: numericQuantity,
         }),
       });
 
-      await loadCart();
+      await fetchCart();
+      return { success: true };
     } catch (error) {
-      alert(error.message);
+      console.error("Error al agregar al carrito:", error.message);
+
+      if (error.message?.toLowerCase().includes("stock")) {
+        alert("La cantidad solicitada supera el stock disponible");
+      } else {
+        alert(error.message || "No se pudo agregar al carrito");
+      }
+
+      return { success: false, message: error.message };
     }
   };
 
-  const updateQuantity = async (productId, quantity) => {
+  const updateQuantity = async (productId, newQuantity) => {
     try {
-      await authFetch(`/${productId}`, {
+      const numericProductId = Number(productId);
+      const numericQuantity = Number(newQuantity);
+
+      if (numericQuantity <= 0) {
+        return await removeFromCart(numericProductId);
+      }
+
+      await authFetch(`/${numericProductId}`, {
         method: "PUT",
-        body: JSON.stringify({ quantity }),
+        body: JSON.stringify({
+          quantity: numericQuantity,
+        }),
       });
 
-      await loadCart();
+      await fetchCart();
+      return { success: true };
     } catch (error) {
-      alert(error.message);
+      console.error("Error al actualizar cantidad:", error.message);
+
+      if (error.message?.toLowerCase().includes("stock")) {
+        alert("La cantidad solicitada supera el stock disponible");
+      } else {
+        alert(error.message || "No se pudo actualizar la cantidad");
+      }
+
+      return { success: false, message: error.message };
     }
   };
 
   const removeFromCart = async (productId) => {
     try {
-      await authFetch(`/${productId}`, {
+      const numericProductId = Number(productId);
+
+      await authFetch(`/${numericProductId}`, {
         method: "DELETE",
       });
 
-      await loadCart();
+      await fetchCart();
+      return { success: true };
     } catch (error) {
-      alert(error.message);
+      console.error("Error al eliminar producto:", error.message);
+      alert(error.message || "No se pudo eliminar el producto");
+      return { success: false, message: error.message };
     }
   };
 
@@ -110,16 +221,31 @@ export const CartProvider = ({ children }) => {
         method: "DELETE",
       });
 
-      setCart([]);
+      setCartItems([]);
+      setTotal(0);
+      return { success: true };
     } catch (error) {
-      alert(error.message);
+      console.error("Error al vaciar carrito:", error.message);
+      alert(error.message || "No se pudo vaciar el carrito");
+      return { success: false, message: error.message };
     }
   };
+
+  const itemCount = useMemo(() => {
+    return (cartItems || []).reduce(
+      (acc, item) => acc + Number(item.quantity || 0),
+      0
+    );
+  }, [cartItems]);
 
   return (
     <CartContext.Provider
       value={{
-        cart,
+        cartItems,
+        total,
+        loading,
+        itemCount,
+        fetchCart,
         addToCart,
         updateQuantity,
         removeFromCart,
