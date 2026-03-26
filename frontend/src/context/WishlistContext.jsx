@@ -19,15 +19,23 @@ const normalizeWishlistResponse = (data) => {
     ? data
     : data.items || data.wishlist || data.favorites || [];
 
-  return rawItems.map((item) => ({
-    id: item.product_id ?? item.id,
-    product_id: item.product_id ?? item.id,
-    nombre: item.nombre ?? item.name ?? "Producto",
-    precio: Number(item.precio ?? item.price ?? 0),
-    imagen_url: item.imagen_url ?? item.image_url ?? item.image ?? "",
-    descripcion: item.descripcion ?? item.description ?? "",
-    categoria: item.categoria ?? item.category ?? "",
-  }));
+  return rawItems.map((item) => {
+    const product = item.product || item;
+
+    return {
+      id: product.id ?? item.product_id ?? item.id,
+      product_id: product.id ?? item.product_id ?? item.id,
+      nombre: product.nombre ?? product.name ?? "Producto",
+      precio: Number(product.precio ?? product.price ?? 0),
+      imagen_url:
+        product.imagen_url ??
+        product.image_url ??
+        product.image ??
+        "",
+      descripcion: product.descripcion ?? product.description ?? "",
+      categoria: product.categoria ?? product.category ?? "",
+    };
+  });
 };
 
 const resolveProductId = (value) => {
@@ -70,10 +78,10 @@ export const WishlistProvider = ({ children }) => {
       if (!response.ok) {
         throw new Error(
           payload?.message ||
-            payload?.error ||
-            payload?.detail ||
-            payload ||
-            `Error HTTP ${response.status}`
+          payload?.error ||
+          payload?.detail ||
+          payload ||
+          `Error HTTP ${response.status}`
         );
       }
 
