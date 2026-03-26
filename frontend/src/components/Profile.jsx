@@ -144,7 +144,7 @@ const Profile = () => {
           ) : (
             <div className="row g-4">
               {wishlist.map((item) => (
-                <div className="col-md-6 col-lg-4" key={item.id}>
+                <div className="col-md-6 col-lg-4" key={item._id}>
                   <div className="profile-wishlist-card h-100">
                     <img
                       src={item.imagen_url}
