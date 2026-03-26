@@ -144,25 +144,25 @@ const Profile = () => {
           ) : (
             <div className="row g-4">
               {wishlist.map((item) => (
-                <div className="col-md-6 col-lg-4" key={item._id}>
+                <div className="col-md-6 col-lg-4" key={item.id}>
                   <div className="profile-wishlist-card h-100">
                     <img
-                      src={item.image}
+                      src={item.imagen_url}
                       className="profile-wishlist-image"
-                      alt={item.name}
+                      alt={item.nombre}
                       onError={handleImageError}
                     />
 
-                    <h5 className="profile-product-name mt-3">{item.name}</h5>
+                    <h5 className="profile-product-name mt-3">{item.nombre}</h5>
 
                     {item.description && (
                       <p className="profile-product-description mb-2">
-                        {item.description}
+                        {item.descripcion}
                       </p>
                     )}
 
                     <p className="profile-product-price">
-                      {Number(item.price).toLocaleString("es-CL", {
+                      {Number(item.precio).toLocaleString("es-CL", {
                         style: "currency",
                         currency: "CLP",
                       })}

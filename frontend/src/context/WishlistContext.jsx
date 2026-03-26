@@ -22,15 +22,23 @@ const normalizeWishlistResponse = (data) => {
   return rawItems.map((item) => {
     const product = item.product || item;
 
+    const precioRaw =
+      product.precio ??
+      product.price ??
+      product.precio_venta ??
+      product.precioVenta ??
+      0;
+
     return {
       id: product.id ?? item.product_id ?? item.id,
       product_id: product.id ?? item.product_id ?? item.id,
       nombre: product.nombre ?? product.name ?? "Producto",
-      precio: Number(product.precio ?? product.price ?? 0),
+      precio: Number(precioRaw) || 0,
       imagen_url:
         product.imagen_url ??
         product.image_url ??
         product.image ??
+        product.imagen ??
         "",
       descripcion: product.descripcion ?? product.description ?? "",
       categoria: product.categoria ?? product.category ?? "",
