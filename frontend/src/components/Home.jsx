@@ -15,7 +15,7 @@ const Home = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch("https://proyecto-final-auraglow.onrender.com");
+        const response = await fetch("https://proyecto-final-auraglow.onrender.com/api/products");
         const data = await response.json();
 
         const mappedProducts = data.map((product) => ({
