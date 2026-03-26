@@ -9,7 +9,7 @@ import React, {
 
 const WishlistContext = createContext();
 
-const API_URL = process.env.REACT_APP_API_URL || "https://proyecto-final-auraglow.onrender.com";
+const API_URL = process.env.REACT_APP_API_URL || "https://proyecto-final-auraglow.onrender.com/api/favorites";
 
 const normalizeWishlistResponse = (data) => {
   const rawItems = Array.isArray(data)
